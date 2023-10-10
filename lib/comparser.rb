@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "comparser/version"
+require "zeitwerk"
 
-module Comparser
-  class Error < StandardError; end
-  # Your code goes here...
-end
+loader = Zeitwerk::Loader.for_gem
+loader.setup
+
+module Comparser; end
+
+loader.eager_load

@@ -1,26 +1,27 @@
 # Comparser
 
 ```ruby
-module MyApp::Email
+module MyApp::Point2D
   include Comparser
 
-  Email = ::Data.define(:address, :domain)
+  Value = ::Data.define(:x, :y)
 
-  def parse(str)
-    parse(str, email)
-  end
-
-  def email
-    map(Email) + match(/[a-zA-Z0-9_-\.+]/) - token('@') + domain
-  end
-
-  def domain
+  def parser
+    map(Value)
+      ._ symbol '('
+      ._ spaces
+      .+ float
+      ._ spaces
+      ._ symbol ','
+      ._ spaces
+      .+ float
+      ._ spaces
+      ._ symbol ')'
   end
 end
 
-result = MyApp::Email.parse("user@example.org")
+result = MyApp::Point2D.parse('(1.5, 0.00009 )')
 
-result.success? # => true
-resutl.failure? # => false
-result.value    # => Myapp::Email[address: "user", domain: "example.org"]
+result.good? # => true
+result.value # => MyApp::Point2D::Value[x: 1.5, y: 0.00009]
 ```
