@@ -13,6 +13,10 @@ module Comparser::Parser
       @result = Result::Good.new(self, nil)
     end
 
+    def eof?
+      @offset >= @source_code.length
+    end
+
     def peek(i = 0)
       peek_offset = @offset + i
 

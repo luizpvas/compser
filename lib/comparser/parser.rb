@@ -19,8 +19,11 @@ module Comparser::Parser
     end
   end
 
-  def chomp_while(&is_good)
+  def chomp_while(is_good:)
     Step.new do |state|
+      while !state.eof? && is_good.call(state.peek)
+        state.chomp
+      end
     end
   end
 end
