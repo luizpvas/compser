@@ -9,6 +9,34 @@ module Comparser::Parser
     state.result
   end
 
+  def one_of(parsers)
+    Step.new do |state|
+      last_error = nil
+
+      next_state =
+        parsers.find do |parser|
+          state.savepoint
+
+          parser.call(state)
+
+          if state.good?
+            state.commit
+            
+            state
+          else
+            last_error = state.result
+            state.rollback
+
+            false
+          end
+        end
+
+      next next_state if next_state
+
+      state.bad!(last_error)
+    end
+  end
+
   def and_then(to_value:)
     Step.new do |state|
       next to_value.(state) if state.good?

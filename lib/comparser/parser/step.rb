@@ -2,16 +2,20 @@
 
 module Comparser::Parser
   class Step < ::Proc
-    def +(next_step)
+    def take(next_step)
       raise "todo"
     end
 
-    def -(next_step)
+    def drop(next_step)
       raise "todo"
     end
 
-    def _(next_step)
+    def compose(next_step)
       self >> next_step
     end
+
+    alias _ compose
+    alias + take
+    alias - drop
   end
 end

@@ -2,21 +2,21 @@
 
 ```ruby
 module MyApp::Point2D
-  include Comparser
+  include Comparser::Parser
 
   Value = ::Data.define(:x, :y)
 
   def parser
     map(Value)
-      ._ symbol '('
-      ._ spaces
-      .+ float
-      ._ spaces
-      ._ symbol ','
-      ._ spaces
-      .+ float
-      ._ spaces
-      ._ symbol ')'
+      .- symbol '('
+      .- spaces
+      .+ decimal
+      .- spaces
+      .- symbol ','
+      .- spaces
+      .+ decimal
+      .- spaces
+      .- symbol ')'
   end
 end
 

@@ -67,11 +67,49 @@ module Comparser::Parser
     end
 
     def good(value)
+      return value if value.is_a?(Result::Good)
+
       Result::Good.new(self, value)
     end
 
     def bad(message)
+      return message if message.is_a?(Result::Bad)
+
       Result::Bad.new(self, message)
+    end
+
+    def savepoint
+      raise ::ArgumentError, "already have a savepoint" if @savepoint_result
+
+      @savepoint_result  = @result
+      @savepoint_offset  = @offset
+      @savepoint_line    = @line
+      @savepoint_column  = @column
+      @savepoint_chomped = @chomped
+    end
+
+    def rollback
+      return if @savepoint_result.nil?
+
+      @result  = @savepoint_result
+      @offset  = @savepoint_offset
+      @line    = @savepoint_line
+      @column  = @savepoint_column
+      @chomped = @savepoint_chomped
+
+      @savepoint_result  = nil
+      @savepoint_offset  = nil
+      @savepoint_line    = nil
+      @savepoint_column  = nil
+      @savepoint_chomped = nil
+    end
+
+    def commit
+      @savepoint_result  = nil
+      @savepoint_offset  = nil
+      @savepoint_line    = nil
+      @savepoint_column  = nil
+      @savepoint_chomped = nil
     end
   end
 end
