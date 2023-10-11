@@ -9,13 +9,23 @@ module Comparser::Parser
     state.result
   end
 
+  def and_then(to_value:)
+    Step.new do |state|
+      next to_value.(state) if state.good?
+
+      state
+    end
+  end
+
   def chomp_if(error_message:, is_good:)
     Step.new do |state|
       if is_good.call(state.peek)
-        next state.chomp
+        state.chomp
+
+        next state
       end
 
-      state.bad(error_message)
+      state.bad!(error_message)
     end
   end
 
@@ -24,6 +34,8 @@ module Comparser::Parser
       while !state.eof? && is_good.call(state.peek)
         state.chomp
       end
+
+      state
     end
   end
 end

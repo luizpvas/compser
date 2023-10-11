@@ -54,10 +54,24 @@ module Comparser::Parser
       chomped
     end
 
-    def bad(error_message)
-      @result = Result::Bad.new(self, error_message)
+    def good?
+      @result.good?
+    end
 
-      self
+    def good!(value)
+      @result = good(value) and return self
+    end
+
+    def bad!(message)
+      @result = bad(message) and return self
+    end
+
+    def good(value)
+      Result::Good.new(self, value)
+    end
+
+    def bad(message)
+      Result::Bad.new(self, message)
     end
   end
 end

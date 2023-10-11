@@ -6,8 +6,12 @@ module Comparser::Parser
       raise "todo"
     end
 
-    def _(next_step)
+    def -(next_step)
       raise "todo"
+    end
+
+    def _(next_step)
+      self >> next_step
     end
   end
 end
