@@ -9,6 +9,10 @@ module Comparser::Parser
     state.result
   end
 
+  def spaces
+    chomp_while(is_good: ->(char) { char == ' ' || char == "\n" || char == "\t" || char == "\r" })
+  end
+
   def one_of(parsers)
     Step.new do |state|
       last_error = nil
