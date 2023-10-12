@@ -14,9 +14,7 @@ class Comparser::Parser::TestAndThen < Minitest::Test
   end
 
   def test_and_then_success_returning_good_result
-    integer =
-      chomp_while(is_good: IsDigit)
-        ._ and_then(to_value: ToInteger)
+    integer = chomp_while(is_good: IsDigit) >> and_then(to_value: ToInteger)
 
     result = parse("123", integer)
 
@@ -25,9 +23,7 @@ class Comparser::Parser::TestAndThen < Minitest::Test
   end
 
   def test_and_then_success_returning_bad_result
-    integer =
-      chomp_while(is_good: IsDigit)
-        ._ and_then(to_value: ToInteger)
+    integer = chomp_while(is_good: IsDigit) >> and_then(to_value: ToInteger)
 
     result = parse("abc", integer)
 
@@ -38,7 +34,7 @@ class Comparser::Parser::TestAndThen < Minitest::Test
   def test_and_then_failure
     integer =
       chomp_if(error_message: "expected digit", is_good: IsDigit)
-        ._ and_then(to_value: ->(_) { raise "and_then should not be called" })
+        .+ and_then(to_value: ->(_) { raise "and_then should not be called" })
 
     result = parse("abc", integer)
 

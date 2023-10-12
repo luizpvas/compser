@@ -15,9 +15,9 @@ module Comparser::Parser
 
   def integer
     chomp_if(is_good: IsDigit, error_message: "expected digit")
-      ._ chomp_while(is_good: IsDigit)
-      ._ assert_peek(is_good: NotAlpha, error_message: "unexpected character")
-      ._ and_then(to_value: ->(state) { state.good!(state.consume_chomped.to_i) })
+      .>> chomp_while(is_good: IsDigit)
+      .>> assert_peek(is_good: NotAlpha, error_message: "unexpected character")
+      .>> and_then(to_value: ->(state) { state.good!(state.consume_chomped.to_i) })
   end
 
   def keyword(str)
@@ -90,17 +90,15 @@ module Comparser::Parser
 
       next_state =
         parsers.find do |parser|
-          state.savepoint
+          savepoint = Savepoint.new(state)
 
           parser.call(state)
 
-          if state.good? || state.has_changes_since_savepoint?
-            state.commit
-            
+          if state.good? || savepoint.has_changes?    
             state
           else
             last_error = state.result
-            state.rollback
+            savepoint.rollback
 
             false
           end
@@ -124,7 +122,7 @@ module Comparser::Parser
     and_then(to_value: ->(state) {
       puts({
         good?: state.good?,
-        chomped: state.peek_chomped,
+        chomped: state.chomped,
         peek: state.peek,
         result_stack: state.result_stack.map(&:value),
       }.inspect)

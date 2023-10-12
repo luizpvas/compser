@@ -16,7 +16,7 @@ class Comparser::Parser::TestChompWhile < Minitest::Test
 
     assert result.good?
     assert_nil result.value
-    assert_equal "123", result.state.peek_chomped
+    assert_equal "123", result.state.chomped
   end
 
   def test_chomp_while_partial_match
@@ -24,7 +24,7 @@ class Comparser::Parser::TestChompWhile < Minitest::Test
 
     assert result.good?
     assert_nil result.value
-    assert_equal "123", result.state.peek_chomped
+    assert_equal "123", result.state.chomped
   end
 
   def test_chomp_while_without_match
@@ -32,6 +32,6 @@ class Comparser::Parser::TestChompWhile < Minitest::Test
 
     assert result.good?
     assert_nil result.value
-    assert_equal "", result.state.peek_chomped
+    assert_equal "", result.state.chomped
   end
 end

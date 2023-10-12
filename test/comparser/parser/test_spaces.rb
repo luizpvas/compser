@@ -11,6 +11,6 @@ class Comparser::Parser::TestSpaces < Minitest::Test
     result = parse(source_code, spaces)
     
     assert result.good?
-    assert_equal "  \n   ", result.state.peek_chomped
+    assert_equal "  \n   ", result.state.chomped
   end
 end

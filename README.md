@@ -50,11 +50,11 @@ result.value # => MyApp::Point2D::Value[x: 1.5, y: 0.00009]
   * `assert_peek`
 * `debug`
 
-## What's up with `.+`, `.-` and `._`?
+## What's up with `.+`, `.-` and `.>>`?
 
 `map`, `symbol`, `spaces` and `decimal` are parser steps that receive
 a parser and return a parser. We combine them using one of the three operators:
 
 * `.-` (`.drop` alias) - Ignore the value produced by the step
 * `.+` (`.take` alias) - Push the value produced by the step to the result stack.
-* `._` (`.compose` alias) - Manual control over the state. Usually used with lower level constructs such as `chomp_if`, `chomp_while` and `and_then`.
+* `.*` (`.compose` alias) - Manual control over the state. Usually used with lower level constructs such as `chomp_if`, `chomp_while` and `and_then`.

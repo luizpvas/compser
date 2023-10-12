@@ -3,6 +3,7 @@
 module Comparser::Parser
   class State
     attr_reader :offset, :line, :column, :result_stack, :savepoint_offset
+    attr_accessor :offset, :line, :column, :chomped, :result_stack
 
     def initialize(source_code)
       @source_code = source_code
@@ -45,10 +46,6 @@ module Comparser::Parser
 
       self
     end
-    
-    def peek_chomped
-      @chomped
-    end
 
     def consume_chomped
       chomped = @chomped
@@ -88,44 +85,6 @@ module Comparser::Parser
       return message if message.is_a?(Result::Bad)
 
       Result::Bad.new(self, message)
-    end
-
-    def savepoint
-      raise ArgumentError, "already have a savepoint" if @savepoint_result_stack
-
-      @savepoint_result_stack  = @result_stack.dup
-      @savepoint_offset        = @offset
-      @savepoint_line          = @line
-      @savepoint_column        = @column
-      @savepoint_chomped       = @chomped
-    end
-
-    def has_changes_since_savepoint?
-      @offset > @savepoint_offset
-    end
-
-    def rollback
-      return if @savepoint_result_stack.nil?
-
-      @result_stack  = @savepoint_result_stack
-      @offset        = @savepoint_offset
-      @line          = @savepoint_line
-      @column        = @savepoint_column
-      @chomped       = @savepoint_chomped
-
-      @savepoint_result_stack  = nil
-      @savepoint_offset        = nil
-      @savepoint_line          = nil
-      @savepoint_column        = nil
-      @savepoint_chomped       = nil
-    end
-
-    def commit
-      @savepoint_result_stack  = nil
-      @savepoint_offset        = nil
-      @savepoint_line          = nil
-      @savepoint_column        = nil
-      @savepoint_chomped       = nil
     end
   end
 end

@@ -2,12 +2,18 @@
 
 module Comparser::Parser
   class Step < ::Proc
-    def take(next_step)
-      compose(next_step) # TODO
-    end
-
     def drop(next_step)
-      compose(next_step) # TODO
+      next_step_with_drop = self.class.new do |state|
+        savepoint = Savepoint.new(state)
+
+        next_step.call(state)
+        
+        savepoint.rollback_chomped_and_result_stack if state.good?
+
+        state
+      end
+
+      compose(next_step_with_drop)
     end
 
     def compose(next_step)
@@ -16,8 +22,8 @@ module Comparser::Parser
       end
     end
 
-    alias _ compose
-    alias + take
+    alias >> compose
+    alias + compose
     alias - drop
   end
 end

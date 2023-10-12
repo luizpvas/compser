@@ -18,7 +18,7 @@ class Comparser::Parser::TestChompIf < Minitest::Test
     assert result.good?
     assert_nil result.value
 
-    assert_equal "1", result.state.peek_chomped
+    assert_equal "1", result.state.chomped
   end
 
   def test_chomp_if_failure
@@ -27,6 +27,6 @@ class Comparser::Parser::TestChompIf < Minitest::Test
     assert result.bad?
     assert_equal "expected a digit", result.message
 
-    assert_equal "", result.state.peek_chomped
+    assert_equal "", result.state.chomped
   end
 end
