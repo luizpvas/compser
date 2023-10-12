@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "bigdecimal"
+
 module Comparser::Parser
   def parse(source_code, parser)
     state = State.new(source_code)
@@ -18,6 +20,19 @@ module Comparser::Parser
       .>>(chomp_while(is_good: IsDigit))
       .>>(assert_peek(is_good: NotAlpha, error_message: "unexpected character"))
       .>>(and_then(to_value: ->(state) { state.good!(state.consume_chomped.to_i) }))
+  end
+
+  def decimal
+    one_or_more_digits =
+      chomp_if(is_good: IsDigit, error_message: "expected digit")
+        .>>(chomp_while(is_good: IsDigit))
+
+    chomp_period = chomp_if(is_good: ->(ch) { ch == "." }, error_message: "expected dot (.)")
+
+    one_or_more_digits
+      .>>(one_of([ chomp_period + one_or_more_digits, succeed ]))
+      .>>(assert_peek(is_good: NotAlpha, error_message: "unexpected character"))
+      .>>(and_then(to_value: ->(state) { state.good!(BigDecimal(state.consume_chomped)) }))
   end
 
   def keyword(str)
@@ -160,7 +175,7 @@ module Comparser::Parser
     Step.new("chomp_if") do |state|
       next state if state.bad?
 
-      if is_good.call(state.peek)
+      if !state.eof? && is_good.call(state.peek)
         state.chomp
 
         next state
