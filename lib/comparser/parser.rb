@@ -112,12 +112,21 @@ module Comparser::Parser
     end
   end
 
+  def lazy(parser)
+    Step.new do |state|
+      next state if state.bad?
+
+      parser.call.call(state)
+    end
+  end
+
   def debug
     and_then(to_value: ->(state) {
       puts({
         good?: state.good?,
         chomped: state.peek_chomped,
-        peek: state.peek
+        peek: state.peek,
+        result_stack: state.result_stack.map(&:value),
       }.inspect)
 
       state
@@ -142,6 +151,8 @@ module Comparser::Parser
 
   def chomp_if(error_message:, is_good:)
     Step.new do |state|
+      next state if state.bad?
+
       if is_good.call(state.peek)
         state.chomp
 
@@ -154,6 +165,8 @@ module Comparser::Parser
 
   def chomp_while(is_good:)
     Step.new do |state|
+      next state if state.bad?
+
       while !state.eof? && is_good.call(state.peek)
         state.chomp
       end

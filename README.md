@@ -8,21 +8,18 @@ module MyApp::Point2D
 
   Value = Data.define(:x, :y)
 
-  def parse(source_code)
-    super(source_code, point)
-  end
-
-  def point
+  def parser
     map Value do
-      .- symbol '('
-      .- spaces
-      .+ decimal
-      .- spaces
-      .- symbol ','
-      .- spaces
-      .+ decimal
-      .- spaces
-      .- symbol ')'
+      succeed
+        .- symbol '('
+        .- spaces
+        .+ decimal
+        .- spaces
+        .- symbol ','
+        .- spaces
+        .+ decimal
+        .- spaces
+        .- symbol ')'
     end
   end
 end
