@@ -9,8 +9,20 @@ module Comparser::Parser
     state.result
   end
 
+  def symbol(str)
+    Step.new do |state|
+      if state.peek(0, str.length) == str
+        str.length.times { state.chomp }
+
+        next state.good!(state.consume_chomped)
+      end
+
+      state.bad!("expected symbol #{str.inspect}")
+    end
+  end
+
   def spaces
-    chomp_while(is_good: ->(char) { char == ' ' || char == "\n" || char == "\t" || char == "\r" })
+    chomp_while(is_good: ->(char) { char == " " || char == "\n" || char == "\t" || char == "\r" })
   end
 
   def one_of(parsers)

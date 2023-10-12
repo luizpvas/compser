@@ -17,13 +17,13 @@ module Comparser::Parser
       @offset >= @source_code.length
     end
 
-    def peek(i = 0)
+    def peek(i = 0, n = 1)
       peek_offset = @offset + i
 
       return if peek_offset < 0
       return if peek_offset >= @source_code.length
 
-      @source_code[peek_offset]
+      return @source_code[peek_offset, n]
     end
 
     def chomp
