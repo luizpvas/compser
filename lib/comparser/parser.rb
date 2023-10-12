@@ -9,6 +9,24 @@ module Comparser::Parser
     state.result
   end
 
+  IsDigit  = ->(ch) { ch.match?(/[0-9]/) }
+  IsAlpha  = ->(ch) { ch.match?(/[a-zA-Z]/) }
+  NotAlpha = ->(ch) { ch.nil? || !IsAlpha[ch] }
+
+  Construct = ->(constructor, value) do
+    return constructor.call(value) if constructor.respond_to?(:call)
+    return constructor.new(value)  if constructor.respond_to?(:new)
+
+    raise ArgumentError, "constructor must be callable"
+  end
+
+  def integer
+    chomp_if(is_good: IsDigit, error_message: "expected digit")
+      ._ chomp_while(is_good: IsDigit)
+      ._ assert_peek(is_good: NotAlpha, error_message: "unexpected character")
+      ._ and_then(to_value: ->(state) { state.good!(state.consume_chomped.to_i) })
+  end
+
   def symbol(str)
     Step.new do |state|
       if state.peek(0, str.length) == str
@@ -53,12 +71,32 @@ module Comparser::Parser
     end
   end
 
+  def debug
+    and_then(to_value: ->(state) {
+      puts({
+        good?: state.good?,
+        chomped: state.peek_chomped,
+        peek: state.peek
+      }.inspect)
+
+      state
+    })
+  end
+
   def and_then(to_value:)
     Step.new do |state|
       next to_value.(state) if state.good?
 
       state
     end
+  end
+
+  def assert_peek(is_good:, error_message:)
+    and_then(to_value: ->(state) {
+      return state.bad!(error_message) if !is_good.call(state.peek)
+
+      state
+    })
   end
 
   def chomp_if(error_message:, is_good:)

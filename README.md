@@ -4,10 +4,10 @@
 module MyApp::Point2D
   include Comparser::Parser
 
-  Value = ::Data.define(:x, :y)
+  Value = Data.define(:x, :y)
 
-  def parser
-    map(Value)
+  def point
+    map(2, Value)
       .- symbol '('
       .- spaces
       .+ decimal
