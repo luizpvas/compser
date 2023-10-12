@@ -2,7 +2,7 @@
 
 module Comparser::Parser
   class State
-    attr_reader :offset, :line, :column, :result_stack
+    attr_reader :offset, :line, :column, :result_stack, :savepoint_offset
 
     def initialize(source_code)
       @source_code = source_code
@@ -98,6 +98,10 @@ module Comparser::Parser
       @savepoint_line          = @line
       @savepoint_column        = @column
       @savepoint_chomped       = @chomped
+    end
+
+    def has_changes_since_savepoint?
+      @offset > @savepoint_offset
     end
 
     def rollback

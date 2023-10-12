@@ -23,6 +23,18 @@ class Comparser::Parser::TestOneOf < Minitest::Test
     assert_equal "foo", result.value
   end
 
+  def test_one_of_commits_to_branch_once_it_succeeds
+    comma_then_integer = one_of [
+      symbol(",") >> integer,
+      succeed
+    ]
+
+    result = parse(",a", comma_then_integer)
+
+    assert result.bad?
+    assert_equal "expected digit", result.message
+  end
+
   def test_one_of_when_no_branch_succeeds
     result = parse("ABC", integer_or_keyword)
 

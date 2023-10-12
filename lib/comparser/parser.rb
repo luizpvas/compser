@@ -94,7 +94,7 @@ module Comparser::Parser
 
           parser.call(state)
 
-          if state.good?
+          if state.good? || state.has_changes_since_savepoint?
             state.commit
             
             state
