@@ -31,4 +31,23 @@ class Comparser::Parser::TestRecursion < Minitest::Test
     assert result.good?
     assert_equal [1, 2, 3], result.value
   end
+
+  def test_recursion_failure_with_one_iteration
+    result = parse(",", comma_separated_integer)
+
+    assert result.bad?
+    assert_equal "expected digit", result.message
+
+    result = parse("1,", comma_separated_integer)
+
+    assert result.bad?
+    assert_equal "expected digit", result.message
+  end
+
+  def test_recursion_failure_with_multiple_iterations
+    result = parse("1, 2, 3,", comma_separated_integer)
+
+    assert result.bad?
+    assert_equal "expected digit", result.message
+  end
 end
