@@ -13,7 +13,7 @@ module MyApp::Point2D
   end
 
   def point
-    map(2, Value)
+    map Value do
       .- symbol '('
       .- spaces
       .+ decimal
@@ -23,6 +23,7 @@ module MyApp::Point2D
       .+ decimal
       .- spaces
       .- symbol ')'
+    end
   end
 end
 
@@ -38,10 +39,12 @@ result.value # => MyApp::Point2D::Value[x: 1.5, y: 0.00009]
   * `integer`
   * `keyword`
   * `symbol`
+  * `double_quoted_string`
   * `spaces`
 * Syntax definition
   * `map`
   * `one_of`
+  * `loop`
   * `sequence`
 * Low level
   * `chomp_if`

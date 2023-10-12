@@ -13,13 +13,6 @@ module Comparser::Parser
   IsAlpha  = ->(ch) { ch.match?(/[a-zA-Z]/) }
   NotAlpha = ->(ch) { ch.nil? || !IsAlpha[ch] }
 
-  Construct = ->(constructor, value) do
-    return constructor.call(value) if constructor.respond_to?(:call)
-    return constructor.new(value)  if constructor.respond_to?(:new)
-
-    raise ArgumentError, "constructor must be callable"
-  end
-
   def integer
     chomp_if(is_good: IsDigit, error_message: "expected digit")
       ._ chomp_while(is_good: IsDigit)
@@ -56,6 +49,39 @@ module Comparser::Parser
 
   def spaces
     chomp_while(is_good: ->(char) { char == " " || char == "\n" || char == "\t" || char == "\r" })
+  end
+
+  def succeed
+    Step.new { _1 }
+  end
+
+  def map(to_value, &block)
+    Step.new do |state|
+      next state if state.bad?
+
+      remember_result_stack_size = state.result_stack.size
+      resolved_parser = block.call
+
+      resolved_parser.call(state)
+
+      if state.good?
+        results = state.pop_results(state.result_stack.size - remember_result_stack_size)
+        values = results.map(&:value)
+
+        mapped_value =
+          if to_value.respond_to?(:call)
+            to_value.call(*values)
+          elsif to_value.respond_to?(:new)
+            to_value.new(*values)
+          else
+            to_value
+          end
+
+        next state.good!(mapped_value)
+      end
+
+      state
+    end
   end
 
   def one_of(parsers)

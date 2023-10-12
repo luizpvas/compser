@@ -2,7 +2,7 @@
 
 module Comparser::Parser
   class State
-    attr_reader :offset, :line, :column
+    attr_reader :offset, :line, :column, :result_stack
 
     def initialize(source_code)
       @source_code = source_code
@@ -60,6 +60,14 @@ module Comparser::Parser
 
     def good?
       @result_stack.last.good?
+    end
+
+    def bad?
+      !good?
+    end
+
+    def pop_results(n)
+      @result_stack.pop(n)
     end
 
     def good!(value)
