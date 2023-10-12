@@ -2,7 +2,7 @@
 
 module Comparser::Parser
   class State
-    attr_reader :offset, :line, :column, :result
+    attr_reader :offset, :line, :column
 
     def initialize(source_code)
       @source_code = source_code
@@ -10,7 +10,11 @@ module Comparser::Parser
       @line = 0
       @column = 0
       @chomped = ::String.new("")
-      @result = Result::Good.new(self, nil)
+      @result_stack = [Result::Good.new(self, nil)]
+    end
+
+    def result
+      @result_stack.last
     end
 
     def eof?
@@ -55,15 +59,15 @@ module Comparser::Parser
     end
 
     def good?
-      @result.good?
+      @result_stack.last.good?
     end
 
     def good!(value)
-      @result = good(value) and return self
+      @result_stack.push(good(value)) and return self
     end
 
     def bad!(message)
-      @result = bad(message) and return self
+      @result_stack.push(bad(message)) and return self
     end
 
     def good(value)
@@ -79,37 +83,37 @@ module Comparser::Parser
     end
 
     def savepoint
-      raise ::ArgumentError, "already have a savepoint" if @savepoint_result
+      raise ArgumentError, "already have a savepoint" if @savepoint_result_stack
 
-      @savepoint_result  = @result
-      @savepoint_offset  = @offset
-      @savepoint_line    = @line
-      @savepoint_column  = @column
-      @savepoint_chomped = @chomped
+      @savepoint_result_stack  = @result_stack.dup
+      @savepoint_offset        = @offset
+      @savepoint_line          = @line
+      @savepoint_column        = @column
+      @savepoint_chomped       = @chomped
     end
 
     def rollback
-      return if @savepoint_result.nil?
+      return if @savepoint_result_stack.nil?
 
-      @result  = @savepoint_result
-      @offset  = @savepoint_offset
-      @line    = @savepoint_line
-      @column  = @savepoint_column
-      @chomped = @savepoint_chomped
+      @result_stack  = @savepoint_result_stack
+      @offset        = @savepoint_offset
+      @line          = @savepoint_line
+      @column        = @savepoint_column
+      @chomped       = @savepoint_chomped
 
-      @savepoint_result  = nil
-      @savepoint_offset  = nil
-      @savepoint_line    = nil
-      @savepoint_column  = nil
-      @savepoint_chomped = nil
+      @savepoint_result_stack  = nil
+      @savepoint_offset        = nil
+      @savepoint_line          = nil
+      @savepoint_column        = nil
+      @savepoint_chomped       = nil
     end
 
     def commit
-      @savepoint_result  = nil
-      @savepoint_offset  = nil
-      @savepoint_line    = nil
-      @savepoint_column  = nil
-      @savepoint_chomped = nil
+      @savepoint_result_stack  = nil
+      @savepoint_offset        = nil
+      @savepoint_line          = nil
+      @savepoint_column        = nil
+      @savepoint_chomped       = nil
     end
   end
 end
