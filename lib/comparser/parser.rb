@@ -27,6 +27,21 @@ module Comparser::Parser
       ._ and_then(to_value: ->(state) { state.good!(state.consume_chomped.to_i) })
   end
 
+  def keyword(str)
+    Step.new do |state|
+      keyword_under_cursor = state.peek(0, str.length) == str
+      followed_by_non_alpha = NotAlpha[state.peek(str.length)]
+
+      if keyword_under_cursor && followed_by_non_alpha
+        str.length.times { state.chomp }
+
+        next state.good!(state.consume_chomped)
+      end
+
+      state.bad!("expected keyword #{str.inspect}")
+    end
+  end
+
   def symbol(str)
     Step.new do |state|
       if state.peek(0, str.length) == str
