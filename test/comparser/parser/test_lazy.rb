@@ -11,11 +11,11 @@ class Comparser::Parser::TestRecursion < Minitest::Test
 
   def comma_separated_integer_helper
     integer
-      .- spaces
-      .+ one_of [
+      .-(spaces)
+      .+(one_of([
         succeed - symbol(",") - spaces + lazy(-> { comma_separated_integer_helper }),
         succeed
-      ]
+      ]))
   end
 
   def test_recursion_success_with_one_call

@@ -11,15 +11,15 @@ module MyApp::Point2D
   def parser
     map Value do
       succeed
-        .- symbol '('
-        .- spaces
-        .+ decimal
-        .- spaces
-        .- symbol ','
-        .- spaces
-        .+ decimal
-        .- spaces
-        .- symbol ')'
+        .-(symbol '(')
+        .-(spaces)
+        .+(decimal)
+        .-(spaces)
+        .-(symbol ',')
+        .-(spaces)
+        .+(decimal)
+        .-(spaces)
+        .-(symbol ')')
     end
   end
 end
@@ -41,8 +41,7 @@ result.value # => MyApp::Point2D::Value[x: 1.5, y: 0.00009]
 * Syntax definition
   * `map`
   * `one_of`
-  * `loop`
-  * `sequence`
+  * `lazy`
 * Low level
   * `chomp_if`
   * `chomp_while`

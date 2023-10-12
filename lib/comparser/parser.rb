@@ -15,13 +15,13 @@ module Comparser::Parser
 
   def integer
     chomp_if(is_good: IsDigit, error_message: "expected digit")
-      .>> chomp_while(is_good: IsDigit)
-      .>> assert_peek(is_good: NotAlpha, error_message: "unexpected character")
-      .>> and_then(to_value: ->(state) { state.good!(state.consume_chomped.to_i) })
+      .>>(chomp_while(is_good: IsDigit))
+      .>>(assert_peek(is_good: NotAlpha, error_message: "unexpected character"))
+      .>>(and_then(to_value: ->(state) { state.good!(state.consume_chomped.to_i) }))
   end
 
   def keyword(str)
-    Step.new do |state|
+    Step.new("keyword:#{str}") do |state|
       keyword_under_cursor = state.peek(0, str.length) == str
       followed_by_non_alpha = NotAlpha[state.peek(str.length)]
 
@@ -36,7 +36,7 @@ module Comparser::Parser
   end
 
   def symbol(str)
-    Step.new do |state|
+    Step.new("symbol:#{str}") do |state|
       if state.peek(0, str.length) == str
         str.length.times { state.chomp }
 
@@ -52,11 +52,11 @@ module Comparser::Parser
   end
 
   def succeed
-    Step.new { _1 }
+    Step.new("succeed") { _1 }
   end
 
   def map(to_value, &block)
-    Step.new do |state|
+    Step.new("map") do |state|
       next state if state.bad?
 
       remember_result_stack_size = state.result_stack.size
@@ -84,12 +84,13 @@ module Comparser::Parser
     end
   end
 
+  # TODO: the `lazy.filter_map(...).first` seems weird.
   def one_of(parsers)
-    Step.new do |state|
+    Step.new("one_of:#{parsers.size}") do |state|
       last_error = nil
 
       next_state =
-        parsers.find do |parser|
+        parsers.lazy.filter_map do |parser|
           savepoint = Savepoint.new(state)
 
           parser.call(state)
@@ -100,39 +101,47 @@ module Comparser::Parser
             last_error = state.result
             savepoint.rollback
 
-            false
+            nil
           end
-        end
+        end.first
 
-      next next_state if next_state
+      if next_state
+        next next_state
+      end 
 
       state.bad!(last_error)
     end
   end
 
   def lazy(parser)
-    Step.new do |state|
+    Step.new("lazy") do |state|
       next state if state.bad?
 
       parser.call.call(state)
     end
   end
 
-  def debug
-    and_then(to_value: ->(state) {
-      puts({
+  def debug(message = nil)
+    Step.new("debug:#{message}") do |state|
+      next state if state.bad?
+
+      details = {
         good?: state.good?,
         chomped: state.chomped,
         peek: state.peek,
         result_stack: state.result_stack.map(&:value),
-      }.inspect)
+      }
+
+      details[:message] = message if message.present?
+
+      puts(details.inspect)
 
       state
-    })
+    end
   end
 
   def and_then(to_value:)
-    Step.new do |state|
+    Step.new("and_then") do |state|
       next to_value.(state) if state.good?
 
       state
@@ -148,7 +157,7 @@ module Comparser::Parser
   end
 
   def chomp_if(error_message:, is_good:)
-    Step.new do |state|
+    Step.new("chomp_if") do |state|
       next state if state.bad?
 
       if is_good.call(state.peek)
@@ -162,7 +171,7 @@ module Comparser::Parser
   end
 
   def chomp_while(is_good:)
-    Step.new do |state|
+    Step.new("chomp_while") do |state|
       next state if state.bad?
 
       while !state.eof? && is_good.call(state.peek)

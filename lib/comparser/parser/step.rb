@@ -1,7 +1,13 @@
 # frozen_string_literal: true
 
 module Comparser::Parser
-  class Step < ::Proc
+  class Step < Proc
+    attr_reader :name
+
+    def initialize(name = nil)
+      @name = name
+    end
+    
     def drop(next_step)
       next_step_with_drop = self.class.new do |state|
         savepoint = Savepoint.new(state)

@@ -2,7 +2,6 @@
 
 module Comparser::Parser
   class State
-    attr_reader :offset, :line, :column, :result_stack, :savepoint_offset
     attr_accessor :offset, :line, :column, :chomped, :result_stack
 
     def initialize(source_code)

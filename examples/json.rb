@@ -1,4 +1,4 @@
-module JsonParser
+module MyJson
   include Comparser::Parser
 
   def expression
