@@ -141,7 +141,7 @@ module Comparser::Parser
       continue = and_then(to_value: ->(state) { state.good!(:continue) })
       iterator = block.call(continue)
       
-      state.good!(:continue)
+      iterator.call(state)
 
       while state.good? && state.result_stack.last.value == :continue
         state.pop_results(1)
