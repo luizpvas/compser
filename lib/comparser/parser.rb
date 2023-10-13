@@ -11,9 +11,10 @@ module Comparser::Parser
     state.result
   end
 
-  IsDigit  = ->(ch) { ch.match?(/[0-9]/) }
-  IsAlpha  = ->(ch) { ch.match?(/[a-zA-Z]/) }
-  NotAlpha = ->(ch) { ch.nil? || !IsAlpha[ch] }
+  AnyCharacter = ->(_) { true }
+  IsDigit      = ->(ch) { ch.match?(/[0-9]/) }
+  IsAlpha      = ->(ch) { ch.match?(/[a-zA-Z]/) }
+  NotAlpha     = ->(ch) { ch.nil? || !IsAlpha[ch] }
 
   def integer
     chomp_if(is_good: IsDigit, error_message: "expected digit")
@@ -33,6 +34,23 @@ module Comparser::Parser
       .>>(one_of([ chomp_period + one_or_more_digits, succeed ]))
       .>>(assert_peek(is_good: NotAlpha, error_message: "unexpected character"))
       .>>(and_then(to_value: ->(state) { state.good!(BigDecimal(state.consume_chomped)) }))
+  end
+
+  def double_quoted_string
+    is_uninteresting = ->(ch) { ch != "\"" && ch != "\\" }
+
+    string_sequence = sequence do |continue|
+      one_of [
+        chomp_token("\\") + chomp_if(is_good: AnyCharacter, error_message: "any character") + continue,
+        succeed - chomp_token('"'),
+        chomp_while(is_good: is_uninteresting) + continue
+      ]
+    end
+
+    succeed
+      .-(chomp_token('"'))
+      .+(string_sequence)
+      .+(and_then(to_value: ->(state) { state.good!(state.consume_chomped) }))
   end
 
   def keyword(str)
@@ -143,7 +161,7 @@ module Comparser::Parser
       
       iterator.call(state)
 
-      while state.good? && state.result_stack.last.value == :continue
+      while state.good? && !state.eof? && state.result_stack.last.value == :continue
         state.pop_results(1)
         iterator.call(state)
       end
@@ -185,6 +203,10 @@ module Comparser::Parser
 
       state
     })
+  end
+
+  def chomp_token(token)
+    chomp_if(is_good: ->(ch) { ch == token }, error_message: "expected #{token}")
   end
 
   def chomp_if(error_message:, is_good:)
