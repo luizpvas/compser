@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Comparser::Step
-  CHAIN_METHODS = {
+  STEPS = {
     integer:     Integer,
     chomp_if:    ChompIf.curry,
     chomp_while: ChompWhile.curry
@@ -24,7 +24,7 @@ class Comparser::Step
 
     case args.first
     when Proc   then @steps << args.first
-    when Symbol then @steps << CHAIN_METHODS.fetch(args.first).call(*rest)
+    when Symbol then @steps << STEPS.fetch(args.first).call(*rest)
     when nil    then block ? @steps << block : raise(ArgumentError, "expected a callable") 
     else        raise ArgumentError, "expected a callable"
     end
