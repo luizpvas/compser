@@ -1,6 +1,7 @@
 # Comparser
 
 * [`integer`](#integer)
+* [`map`](#map)
 * [`chomp_if`](#chomp_if)
 * [`chomp_while`](#chomp_while)
 
@@ -17,6 +18,21 @@ parser.call(Comparser::State.new('2023')).tap do |state|
   state.offset  # => 4
   state.chomped # => ''
   state.result  # => Result::Good[value: 2023]
+end
+```
+
+#### `map`
+
+Consumes results pushed to the state in the pipeline and pushes a new result.
+
+```ruby
+PlusOne = ->(x) { x + 1 }
+
+parser = map(PlusOne).and_then(:integer)
+
+parser.call(Comparser::State.new('99')).tap do |state|
+  state.good?  # => true
+  state.result # => Result::Good[value: 100]
 end
 ```
 
