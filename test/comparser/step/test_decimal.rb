@@ -45,4 +45,13 @@ class Comparser::Step::DecimalTest < Minitest::Test
       assert_equal "unexpected character", state.result.message
     end
   end
+
+  def test_decimal_with_trailing_alpha_character
+    parser = succeed.and_then(:decimal)
+
+    parser.call(State.new("123.456a")).tap do |state|
+      assert state.bad?
+      assert_equal "unexpected character", state.result.message
+    end
+  end
 end

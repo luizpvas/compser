@@ -14,6 +14,7 @@ class Comparser::Step
           .and_then(:chomp_while, IsDigit),
         Comparser::Step.new
       ])
+      .and_then(NotFollowedByAlpha)
       .and_then { |state| state.good!(BigDecimal(state.consume_chomped)) }
   end
 end
