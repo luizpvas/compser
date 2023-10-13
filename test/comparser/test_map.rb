@@ -34,4 +34,13 @@ class Comparser::TestMap < Minitest::Test
       assert_equal 3, state.result.value
     end
   end
+
+  def test_map_with_bad_state
+    parser = map(->{ "foo" })
+
+    parser.call(State.new(nil).bad!("something went wrong")).tap do |state|
+      assert state.bad?
+      assert_equal "something went wrong", state.result.message
+    end
+  end
 end
