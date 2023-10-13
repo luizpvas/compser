@@ -8,29 +8,41 @@ class Comparser::Step::TestAndThen < Minitest::Test
   def test_and_then_with_identity_function
     parser = succeed.and_then(->(state) { state })
 
-    assert_equal 10, parser.call(10)
+    state = State.new("")
+
+    assert_equal state, parser.call(state)
   end
 
   def test_and_then_with_transformation
-    parser = succeed.and_then(->(state) { state + 1 })
+    parser = succeed.and_then(->(state) { state.chomp })
 
-    assert_equal 11, parser.call(10)
+    state = parser.call(State.new("a"))
+
+    assert_equal "a", state.chomped
   end
 
-  def test_and_then_with_multiple_transformations
-    parser = succeed
-      .and_then(->(state) { state + [1] })
-      .and_then(->(state) { state + [2] })
+  def test_and_then_with_multiple_calls
+    calls = []
 
-    assert_equal [1, 2], parser.call([])
+    parser = succeed
+      .and_then(->(state) { calls << 1; state })
+      .and_then(->(state) { calls << 2; state })
+
+    parser.call(State.new("a"))
+
+    assert_equal [1, 2], calls
   end
 
   def test_and_then_with_block
-    parser = succeed
-      .and_then { |state| state + [1] }
-      .and_then { |state| state + [2] }
+    calls = []
 
-    assert_equal [1, 2], parser.call([])
+    parser = succeed
+      .and_then { |state| calls << 1; state }
+      .and_then { |state| calls << 2; state }
+
+    parser.call(State.new("a"))
+
+    assert_equal [1, 2], calls
   end
 
   def test_and_then_without_callable
@@ -38,5 +50,28 @@ class Comparser::Step::TestAndThen < Minitest::Test
 
     assert_raises(ArgumentError) { parser.and_then }
     assert_raises(ArgumentError) { parser.and_then("foo") }
+
+    succeed
+      .and_then(:chomp_if, ->(x) { x == "foo" })
+  end
+
+  def test_and_then_does_not_call_next_step_if_state_is_eof
+    calls = []
+    
+    parser = succeed.and_then(->(state) { calls << 1; state })
+
+    parser.call(State.new(""))
+
+    assert_equal [], calls
+  end
+
+  def test_and_then_does_not_call_next_step_if_state_is_bad
+    calls = []
+    
+    parser = succeed.and_then(->(state) { calls << 1; state })
+
+    parser.call(State.new("abc").bad!("something went wrong"))
+
+    assert_equal [], calls
   end
 end

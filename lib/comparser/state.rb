@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Comparser::State
-  attr_accessor :offset, :line, :column, :chomped, :result_stack
+  attr_accessor :source_code, :offset, :line, :column, :chomped, :result_stack
 
   def initialize(source_code)
     @source_code = source_code
