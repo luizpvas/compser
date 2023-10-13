@@ -9,7 +9,8 @@ class Comparser::Step
     integer:              Integer,
     one_of:               OneOf.curry,
     sequence:             Sequence.curry,
-    spaces:               Spaces
+    spaces:               Spaces,
+    token:                Token.curry
   }.freeze
 
   def initialize(mapper = nil)

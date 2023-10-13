@@ -13,6 +13,7 @@ require_relative "comparser/step/integer"
 require_relative "comparser/step/one_of"
 require_relative "comparser/step/sequence"
 require_relative "comparser/step/spaces"
+require_relative "comparser/step/token"
 require_relative "comparser/step"
 
 module Comparser

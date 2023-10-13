@@ -3,6 +3,7 @@
 * [`drop`](#drop)
 * [`integer`](#integer)
 * [`decimal`](#decimal)
+* [`token`](#token)
 * [`double_quoted_string`](#double_quoted_string)
 * [`map`](#map)
 * [`one_of`](#one_of)
@@ -61,7 +62,27 @@ parser.call(Comparser::State.new('0.00009')).tap do |state|
 end
 ```
 
+#### `token`
+
+Parses the exact string from source.
+
+```ruby
+parser = succeed.and_then(:token, "module")
+
+parser.call(Comparser::State.new("module")).tap do |state|
+  state.good?  # => true
+  state.result # => Result::Good<value: "module">
+end
+
+parser.call(Comparser::State.new("modu")).tap do |state|
+  state.bad?   # => true
+  state.result # => Result::Bad<message: "expected 'module'">
+end
+```
+
 #### `double_quoted_string`
+
+Parses a string between double quotes ("). Line breaks and tabs inside the string is supported.
 
 ```ruby
 parser = succeed.and_then(:double_quoted_string)
