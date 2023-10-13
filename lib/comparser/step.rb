@@ -4,6 +4,7 @@ class Comparser::Step
   STEPS = {
     chomp_if:    ChompIf.curry,
     chomp_while: ChompWhile.curry,
+    decimal:     Decimal,
     integer:     Integer,
     one_of:      OneOf.curry,
     spaces:      Spaces

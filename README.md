@@ -1,6 +1,7 @@
 # Comparser
 
 * [`integer`](#integer)
+* [`decimal`](#decimal)
 * [`map`](#map)
 * [`one_of`](#one_of)
 * [`spaces`](#spaces)
@@ -20,6 +21,21 @@ parser.call(Comparser::State.new('2023')).tap do |state|
   state.offset  # => 4
   state.chomped # => ''
   state.result  # => Result::Good[value: 2023]
+end
+```
+
+#### `decimal`
+
+Chomps a floating point number from source, casts it to BigDecimal and pushes the result to the state.
+
+```ruby
+parser = succeed.and_then(:integer)
+
+parser.call(Comparser::State.new('0.00009')).tap do |state|
+  state.good?   # => true
+  state.offset  # => 7
+  state.chomped # => ''
+  state.result  # => Result::Good[value: BigDecimal<0.00009>]
 end
 ```
 
