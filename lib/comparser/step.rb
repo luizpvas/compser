@@ -7,8 +7,15 @@ class Comparser::Step
     state.bad!("unexpected character")
   end
 
+  ChompWhile = ->(predicate, state) do
+    state.chomp while !state.eof? && predicate.call(state.peek)
+
+    state
+  end
+
   CHAIN_METHODS = {
-    chomp_if: ChompIf.curry
+    chomp_if: ChompIf.curry,
+    chomp_while: ChompWhile.curry
   }.freeze
 
   def initialize
