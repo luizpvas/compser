@@ -22,6 +22,43 @@ module MyApp::Point2D
         .-(symbol ')')
     end
   end
+
+  def list_of_integers
+    map identity do
+      succeed
+        .drop(:symbol, '[')
+        .drop(:spaces)
+        .take(:sequence, comma_separated_integers)
+        .drop(:symbol, ']')
+    end
+  end
+
+  def comma_separated_integers
+    sequence do
+      succeed
+        .take(:integer)
+        .drop(:spaces)
+        .take(:one_of, [
+          succeed.drop(:symbol, ',').drop(:spaces).continue,
+          succeed.done
+        ])
+    end
+  end
+
+  def parser
+    map Value do
+      succeed
+        .drop(:symbol, '(')
+        .drop(:spaces)
+        .take(:decimal)
+        .drop(:spaces)
+        .drop(:symbol, ',')
+        .drop(:spaces)
+        .take(:decimal)
+        .drop(:spaces)
+        .drop(:symbol, ')')
+    end
+  end
 end
 
 result = MyApp::Point2D.parse('(1.5, 0.00009 )')
