@@ -9,7 +9,7 @@ class Comparser::Step
           .and_then(:chomp_if, ->(_) { true })
           .and_then(continue),
         Comparser::Step.new
-          .and_then(:chomp_if, ->(ch) { ch == "\"" })
+          .drop(:chomp_if, ->(ch) { ch == "\"" })
           .and_then(done),
         Comparser::Step.new
           .and_then(:chomp_while, ->(ch) { ch != "\\" && ch != "\"" })
@@ -19,7 +19,7 @@ class Comparser::Step
 
   DoubleQuotedString = -> do
     Comparser::Step.new
-      .and_then(:chomp_if, ->(ch) { ch == "\"" })
+      .drop(:chomp_if, ->(ch) { ch == "\"" })
       .and_then(:sequence, DoubleQuotedStringHelper)
       .and_then { |state| state.good!(state.consume_chomped) }
   end

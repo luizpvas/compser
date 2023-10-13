@@ -6,15 +6,13 @@ class Comparser::Step
     done = ->(state) { state.good!(:done) }
 
     state = helper.call(continue, done).call(state)
-    while !state.eof? && state.good? && state.result.value == :continue
-      puts state.result.inspect
-
+    while state.good? && state.result.value == :continue
       state.pop_results(1)
 
       state = helper.call(continue, done).call(state)
     end
 
-    puts state.result.inspect
+    return state if state.bad?
 
     if state.good? && state.result.value == :done
       state.pop_results(1)

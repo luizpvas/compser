@@ -20,16 +20,44 @@ class Comparser::Step::TestSequence < Minitest::Test
       succeed
         .and_then(:integer)
         .and_then(:one_of, [
-          succeed.and_then(:spaces).and_then(continue),
-          succeed.and_then(done)
+          succeed.drop(:chomp_if, ->(ch) { ch == "," }).and_then(continue),
+          done
         ])
     end
 
     parser = map(->(*ints) { ints }).and_then(:sequence, integer_then_spaces)
 
-    parser.call(Comparser::State.new("12 23 34")).tap do |state|
+    parser.call(Comparser::State.new("12,23,34")).tap do |state|
       assert state.good?
       assert_equal [12, 23, 34], state.result.value
+    end
+  end
+
+  def test_sequence_with_multiple_iterations_and_a_failure
+    integer_then_spaces = ->(continue, done) do
+      succeed
+        .and_then(:integer)
+        .and_then(:one_of, [
+          succeed.drop(:chomp_if, ->(ch) { ch == "," }).and_then(continue),
+          done
+        ])
+    end
+
+    parser = map(->(*ints) { ints }).and_then(:sequence, integer_then_spaces)
+
+    parser.call(Comparser::State.new("12,23,34,")).tap do |state|
+      assert state.bad?
+      assert_equal "unexpected eof", state.result.message
+    end
+  end
+
+  def test_unbdoung_sequence_reaching_eof
+    helper = ->(continue, done) { succeed.and_then(:chomp_if, ->(_) { true }).and_then(continue) }
+    parser = succeed.and_then(:sequence, helper)
+
+    parser.call(Comparser::State.new("1234")).tap do |state|
+      assert state.bad?
+      assert_equal "unexpected eof", state.result.message
     end
   end
 end

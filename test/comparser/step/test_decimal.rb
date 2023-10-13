@@ -42,7 +42,7 @@ class Comparser::Step::DecimalTest < Minitest::Test
 
     parser.call(State.new("123.")).tap do |state|
       assert state.bad?
-      assert_equal "unexpected character", state.result.message
+      assert_equal "unexpected eof", state.result.message
     end
   end
 
