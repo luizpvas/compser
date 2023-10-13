@@ -1,8 +1,24 @@
 # Comparser
 
+* [`integer`](#integer)
 * [`chomp_if`](#chomp_if)
 * [`chomp_while`](#chomp_while)
 
+
+#### `integer`
+
+Chomps an integer from source and pushes the result to the state.
+
+```ruby
+parser = succeed.and_then(:integer)
+
+parser.call(Comparser::State.new('2023')).tap do |state|
+  state.good?   # => true
+  state.offset  # => 4
+  state.chomped # => ''
+  state.result  # => Result::Good[value: 2023]
+end
+```
 
 #### `chomp_if`
 
