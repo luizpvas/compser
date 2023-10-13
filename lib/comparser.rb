@@ -7,6 +7,7 @@ require_relative "comparser/state"
 require_relative "comparser/step/chomp_if"
 require_relative "comparser/step/chomp_while"
 require_relative "comparser/step/integer"
+require_relative "comparser/step/spaces"
 require_relative "comparser/step"
 
 module Comparser

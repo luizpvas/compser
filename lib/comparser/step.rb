@@ -3,6 +3,7 @@
 class Comparser::Step
   STEPS = {
     integer:     Integer,
+    spaces:      Spaces,
     chomp_if:    ChompIf.curry,
     chomp_while: ChompWhile.curry
   }.freeze
