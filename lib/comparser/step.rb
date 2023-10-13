@@ -7,6 +7,7 @@ class Comparser::Step
     decimal:     Decimal,
     integer:     Integer,
     one_of:      OneOf.curry,
+    sequence:    Sequence.curry,
     spaces:      Spaces
   }.freeze
 
@@ -38,12 +39,33 @@ class Comparser::Step
   def and_then(*args, &block)
     first, *rest = args
 
-    case args.first
-    when Proc   then @steps << args.first
-    when Symbol then @steps << STEPS.fetch(args.first).call(*rest)
-    when nil    then block ? @steps << block : raise(ArgumentError, "expected a callable") 
-    else        raise ArgumentError, "expected a callable"
-    end
+    step =
+      case first
+      when Proc   then first
+      when Symbol then STEPS.fetch(args.first).call(*rest)
+      when nil    then block ? block : raise(ArgumentError, "expected a callable") 
+      else        raise ArgumentError, "expected a callable"
+      end
+
+    @steps << step
+
+    self
+  end
+
+  alias take and_then
+
+  def drop(*args, &block)
+    first, *rest = args
+
+    step =
+      case first
+      when Proc   then Drop.(first)
+      when Symbol then Drop.(STEPS.fetch(first).call(*rest))
+      when nil    then block ? Drop.(block) : raise(ArgumentError, "expected a callable") 
+      else        raise ArgumentError, "expected a callable"
+      end
+
+    @steps << step
 
     self
   end
