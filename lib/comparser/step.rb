@@ -2,10 +2,11 @@
 
 class Comparser::Step
   STEPS = {
-    integer:     Integer,
-    spaces:      Spaces,
     chomp_if:    ChompIf.curry,
-    chomp_while: ChompWhile.curry
+    chomp_while: ChompWhile.curry,
+    integer:     Integer,
+    one_of:      OneOf.curry,
+    spaces:      Spaces
   }.freeze
 
   def initialize(mapper = nil)

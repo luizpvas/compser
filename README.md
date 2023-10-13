@@ -2,6 +2,7 @@
 
 * [`integer`](#integer)
 * [`map`](#map)
+* [`one_of`](#one_of)
 * [`spaces`](#spaces)
 * [`chomp_if`](#chomp_if)
 * [`chomp_while`](#chomp_while)
@@ -34,6 +35,28 @@ parser = map(PlusOne).and_then(:integer)
 parser.call(Comparser::State.new('99')).tap do |state|
   state.good?  # => true
   state.result # => Result::Good[value: 100]
+end
+```
+
+#### `one_of`
+
+Attempts to parse each branch in the order they were defined. If all branches fail, then the parser fails.
+Important: The parser commits to the branch if it chomps from source or consumes or pushes a result. 
+
+```ruby
+parser = succeed.and_then(:one_of, [
+  succeed.and_then(:integer),
+  succeed.and_then(:double_quoted_string)
+])
+
+parser.call(Comparser::State.new('2023')).tap do |state|
+  state.good?  # => true
+  state.result # => Result::Good[value: 2023]
+end
+
+parser.call(Comparser::State.new('"Hello, world!"')).tap do |state|
+  state.good?  # => true
+  state.result # => Result::Good[value: 'Hello, world!']
 end
 ```
 
