@@ -3,6 +3,7 @@
 * [`drop`](#drop)
 * [`integer`](#integer)
 * [`decimal`](#decimal)
+* [`double_quoted_string`](#double_quoted_string)
 * [`map`](#map)
 * [`one_of`](#one_of)
 * [`sequence`](#sequence)
@@ -57,6 +58,17 @@ parser.call(Comparser::State.new('0.00009')).tap do |state|
   state.offset  # => 7
   state.chomped # => ''
   state.result  # => Result::Good<value: BigDecimal>0.00009>]
+end
+```
+
+#### `double_quoted_string`
+
+```ruby
+parser = succeed.and_then(:double_quoted_string)
+
+parser.call(Comparser::State.new('"Hello, world!"')).tap do |state|
+  state.good?  # => true
+  state.result # => Result::Good<value: 'Hello, world!'>
 end
 ```
 
