@@ -13,4 +13,8 @@ module Comparser
   def succeed
     Step.new
   end
+
+  def map(mapper)
+    Step.new(mapper)
+  end
 end
