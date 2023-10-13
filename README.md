@@ -1,96 +1,46 @@
 # Comparser
 
-Comparser is a parser 
+* [`chomp_if`](#chomp_if)
+* [`chomp_while`](#chomp_while)
+
+
+#### `chomp_if`
+
+Chomps a single character from source if predicate returns true. Otherwise, a bad result is pushed to state.
 
 ```ruby
-module MyApp::Point2D
-  include Comparser::Parser
+parser = succeed.and_then(:chomp_if, ->(ch) { ch == 'a' })
 
-  Value = Data.define(:x, :y)
-
-  def parser
-    map Value do
-      succeed
-        .-(symbol '(')
-        .-(spaces)
-        .+(decimal)
-        .-(spaces)
-        .-(symbol ',')
-        .-(spaces)
-        .+(decimal)
-        .-(spaces)
-        .-(symbol ')')
-    end
-  end
-
-  def list_of_integers
-    map identity do
-      succeed
-        .drop(:symbol, '[')
-        .drop(:spaces)
-        .take(:sequence, comma_separated_integers)
-        .drop(:symbol, ']')
-    end
-  end
-
-  def comma_separated_integers
-    sequence do
-      succeed
-        .take(:integer)
-        .drop(:spaces)
-        .take(:one_of, [
-          succeed.drop(:symbol, ',').drop(:spaces).continue,
-          succeed.done
-        ])
-    end
-  end
-
-  def parser
-    map Value do
-      succeed
-        .drop(:symbol, '(')
-        .drop(:spaces)
-        .take(:decimal)
-        .drop(:spaces)
-        .drop(:symbol, ',')
-        .drop(:spaces)
-        .take(:decimal)
-        .drop(:spaces)
-        .drop(:symbol, ')')
-    end
-  end
+parser.call(Comparser::State.new('aaabb')).tap do |state|
+  state.good?   # => true
+  state.offset  # => 1
+  state.chomped # => 'a'
 end
 
-result = MyApp::Point2D.parse('(1.5, 0.00009 )')
-
-result.good? # => true
-result.value # => MyApp::Point2D::Value[x: 1.5, y: 0.00009]
+parser.call(Comparser::State.new('bbbcc')).tap do |state|
+  state.bad?    # => true
+  state.offset  # => 0
+  state.chomped # => ''
+end
 ```
 
-## All functions
+#### `chomp_while`
 
-* High level
-  * `integer`
-  * `keyword`
-  * `symbol`
-  * `double_quoted_string`
-  * `spaces`
-* Syntax definition
-  * `map`
-  * `one_of`
-  * `lazy`
-* Low level
-  * `chomp_if`
-  * `chomp_while`
-  * `and_then`
-  * `assert_peek`
-* `debug`
+Chomps characters from source as long as predicate returns true. This function always leaves the state in a good
+state, even if predicate returns false on the first run. It works as a zero-or-more loop.
 
-## What's up with `.+`, `.-` and `.>>`?
+```ruby
+parser = succeed.and_then(:chomp_while, ->(ch) { ch == 'a' })
 
-`map`, `symbol`, `spaces` and `decimal` are parser steps that receive
-a parser and return a parser. We combine them using one of the three operators:
+parser.call(Comparser::State.new('aaabb')).tap do |state|
+  state.good?   # => true
+  state.offset  # => 3
+  state.chomped # => 'aaa'
+end
 
-* `.-` (`.drop` alias) - Ignore the value produced by the step
-* `.+` (`.take` alias) - Push the value produced by the step to the result stack.
-* `.*` (`.compose` alias) - Manual control over the state. Usually used with lower level constructs such as `chomp_if`, `chomp_while` and `and_then`.
+parser.call(Comparser::State.new('bbbcc')).tap do |state|
+  state.good?   # => true
+  state.offset  # => 0
+  state.chomped # => ''
+end
+``````
