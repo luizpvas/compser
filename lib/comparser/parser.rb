@@ -136,6 +136,22 @@ module Comparser::Parser
     end
   end
 
+  def sequence(&block)
+    Step.new("sequence") do |state|
+      continue = and_then(to_value: ->(state) { state.good!(:continue) })
+      iterator = block.call(continue)
+      
+      state.good!(:continue)
+
+      while state.good? && state.result_stack.last.value == :continue
+        state.pop_results(1)
+        iterator.call(state)
+      end
+
+      state
+    end
+  end
+
   def debug(message = nil)
     Step.new("debug:#{message}") do |state|
       next state if state.bad?
