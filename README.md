@@ -74,7 +74,8 @@ end
 
 #### `map`
 
-Consumes results pushed to the state in the pipeline and pushes a new result.
+Calls the map function with the accumulated state's results. The result returned from map is pushed to the result stack.
+Important: The arity of the map function should be the same results produced in the pipeline.
 
 ```ruby
 PlusOne = ->(x) { x + 1 }
