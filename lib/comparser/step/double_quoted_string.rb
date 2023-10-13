@@ -1,6 +1,16 @@
 # frozen_string_literal: true
 
 class Comparser::Step
+  IsUninteresting = ->(ch) do
+    ch != "\\" && ch != "\""
+  end
+  
+  AssertNotEof = ->(state) do
+    return state.bad!("unexpected eof") if state.eof?
+
+    state
+  end
+
   DoubleQuotedStringHelper = ->(continue, done) do
     Comparser::Step.new
       .and_then(:one_of, [
@@ -12,7 +22,9 @@ class Comparser::Step
           .drop(:chomp_if, ->(ch) { ch == "\"" })
           .and_then(done),
         Comparser::Step.new
-          .and_then(:chomp_while, ->(ch) { ch != "\\" && ch != "\"" })
+          .and_then(:chomp_if, IsUninteresting)
+          .and_then(:chomp_while, IsUninteresting)
+          .and_then(AssertNotEof)
           .and_then(continue)
       ])
   end
