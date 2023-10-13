@@ -2,6 +2,7 @@
 
 * [`integer`](#integer)
 * [`map`](#map)
+* [`spaces`](#spaces)
 * [`chomp_if`](#chomp_if)
 * [`chomp_while`](#chomp_while)
 
@@ -33,6 +34,20 @@ parser = map(PlusOne).and_then(:integer)
 parser.call(Comparser::State.new('99')).tap do |state|
   state.good?  # => true
   state.result # => Result::Good[value: 100]
+end
+```
+
+#### `spaces`
+
+Chompes zero or more blankspaces, line breaks and tabs. Always succeeds.
+
+```ruby
+parser = succeed.and_then(:spaces)
+
+parser.call(Comparser::State.new('   \nfoo')).tap do |state|
+  state.good?   # => true
+  state.offset  # => 5
+  state.chomped # => '   \n'
 end
 ```
 
