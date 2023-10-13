@@ -55,14 +55,17 @@ class Comparser::Step::TestAndThen < Minitest::Test
       .and_then(:chomp_if, ->(x) { x == "foo" })
   end
 
-  def test_and_then_does_not_call_next_step_if_state_is_eof
-    calls = []
-    
-    parser = succeed.and_then(->(state) { calls << 1; state })
+  def test_and_then_consume_chomped_and_push_result_to_stack
+    parser = succeed
+      .and_then(:chomp_if, ->(ch) { ch == "a" })
+      .and_then(:chomp_if, ->(ch) { ch == "b" })
+      .and_then { |state| state.good!(state.consume_chomped) }
 
-    parser.call(State.new(""))
+    state = parser.call(State.new("ab"))
 
-    assert_equal [], calls
+    assert state.good?
+    assert_equal "", state.chomped
+    assert_equal "ab", state.result.value
   end
 
   def test_and_then_does_not_call_next_step_if_state_is_bad

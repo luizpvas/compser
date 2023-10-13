@@ -17,7 +17,7 @@ class Comparser::Step
 
   def call(state)
     @steps.reduce(state) do |state, step|
-      return state if state.eof? || state.bad?
+      return state if state.bad?
 
       step.call(state)
     end
