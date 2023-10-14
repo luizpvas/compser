@@ -51,7 +51,7 @@ parser.parse('123a') # => Bad<...>
 parser.parse('0x1A') # => Bad<...>
 
 
-# negative integers with '-' prefix
+# support negative integers with '-' prefix
 def my_integer
   take(:one_of, [
     map(->(x) { x * -1 }).drop(:token, '-').take(:integer),

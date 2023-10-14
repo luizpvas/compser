@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    Compser (0.1.0)
+    compser (0.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -13,7 +13,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  Compser!
+  compser!
   minitest (~> 5.0)
   rake (~> 13.0)
 
