@@ -30,30 +30,40 @@ parser.parse('[900')  # => Bad<...>
 
 #### `integer`
 
-Parse integers with optional leading `-` for negatives.
+Parse integers.
 
 ```ruby
 parser = take(:integer)
 
 parser.parse('1')    # => Good<1>
 parser.parse('1234') # => Good<1234>
-parser.parse('-500') # => Good<-500>
 
+parser.parse('-500') # => Bad<...>
 parser.parse('1.34') # => Bad<...>
 parser.parse('1e31') # => Bad<...>
 parser.parse('123a') # => Bad<...>
 parser.parse('0x1A') # => Bad<...>
+
+
+# negative integers with '-' prefix
+def my_integer
+  take(:one_of, [
+    map(->(x) { x * -1 }).drop(:token, '-').take(:integer),
+    take(:integer)
+  ])
+end
 ```
 
 #### `decimal`
 
-Parse floating points as BigDecimal with optional leading `-` for negatives.
+Parse floating points as BigDecimal.
 
 ```ruby
 parser = take(:decimal)
 
 parser.parse('0.00009')  # => Good<0.00009>
-parser.parse('-0.00009') # => Good<-0.00009>
+
+parser.parse('-0.00009') # => Bad<...>
 parser.parse('bad')      # => Bad<...>
 parser.parse('1e31')     # => Bad<...>
 parser.parse('123a')     # => Bad<...>
@@ -61,7 +71,7 @@ parser.parse('123a')     # => Bad<...>
 
 #### `token`
 
-Parses the exact string from source.
+Parses the token from source.
 
 ```ruby
 parser = take(:token, 'module')
