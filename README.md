@@ -145,7 +145,7 @@ early without chomping any character from source .
 parser = take(:one_of, [ take(:integer), take(:double_quoted_string) ])
 
 parser.parse('2023')            # => Good<2023>
-parser.parse('"Hello, world!"') # => Good<2023>
+parser.parse('"Hello, world!"') # => Good<'Hello, world!'>
 parser.parse('true')            # => Bad<...>
 ```
 
