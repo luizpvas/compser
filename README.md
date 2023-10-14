@@ -4,7 +4,7 @@
 * [`integer`](#integer)
 * [`decimal`](#decimal)
 * [`token`](#token)
-* [`keyword`] (#keyword)
+* [`keyword`](#keyword)
 * [`double_quoted_string`](#double_quoted_string)
 * [`map`](#map)
 * [`one_of`](#one_of)
@@ -89,80 +89,75 @@ parser.parse('le')     # => Bad<...>
 
 #### `double_quoted_string`
 
-Parses a string between double quotes ("). Line breaks and tabs inside the string is supported.
+Parses a string between double quotes. Line breaks and tabs are supported.
 
 ```ruby
 parser = take(:double_quoted_string)
 
-parser.call(Comparser::State.new('"Hello, world!"')).tap do |state|
-  state.good?  # => true
-  state.result # => Result::Good<value: 'Hello, world!'>
-end
+parser.parse('"Hello, world!"')       # => Good<'Hello, world!'>
+parser.parse('"line1\nline2"')        # => Good<'line1\\nline2'>
+parser.parse('"Hello, \\"world\\"!"') # => Good<'Hello, "world"!'>
+
+parser.parse('foo')       # => Bad<...>
+parser.parse('foo "bar"') # => Bad<...>
+parser.parse('"foo')      # => Bad<...>
 ```
 
 #### `map`
 
-Calls the map function with the accumulated state's results. Accumuluate results are popped from the stack.
-The return value from the map call is pushed to the stack. Important: The arity of the map function should
-be equal to the amount of results produced in the pipeline.
+Calls the map function with the taken values in the current pipeline if it succeeds. The output from map becomes the output of the parser,
+that is, any parser with a map can be chained into other parsers.
+
+Important: The arity of the map function should be equal to the amount of taken values in the pipeline.
 
 ```ruby
-PlusOne = ->(x) { x + 1 }
+Sum = ->(a, b) { a + b }
 
-parser = map(PlusOne).and_then(:integer)
+parser = map(Sum).take(:integer).drop(:token, '+').take(:integer)
 
-parser.call(Comparser::State.new('99')).tap do |state|
-  state.good?  # => true
-  state.result # => Result::Good<value: 100>
-end
+parser.parse('1+1') # => Good<2>
+parser.parse('1+')  # => Bad<...>
 ```
 
 #### `one_of`
 
-Attempts to parse each branch in the order they were defined. If all branches fail, then the parser fails.
-Important: The parser commits to the branch if it chomps from source or consumes or pushes a result. 
+Attempts to parse each branch in the order they appear in the list. If all branches fail then the parser fails.
+Important: `one_of` will fail on the current branch it had a partial success before failing. The branch has to fail
+early without chomping any character from source .
 
 ```ruby
-parser = succeed.and_then(:one_of, [
-  succeed.and_then(:integer),
-  succeed.and_then(:double_quoted_string)
-])
+parser = take(:one_of, [ take(:integer), take(:double_quoted_string) ])
 
-parser.call(Comparser::State.new('2023')).tap do |state|
-  state.good?  # => true
-  state.result # => Result::Good<value: 2023>
-end
-
-parser.call(Comparser::State.new('"Hello, world!"')).tap do |state|
-  state.good?  # => true
-  state.result # => Result::Good<value: 'Hello> world!']
-end
+parser.parse('2023')            # => Good<2023>
+parser.parse('"Hello, world!"') # => Good<2023>
+parser.parse('true')            # => Bad<...>
 ```
 
 #### `sequence`
 
-Iterates over the same parser until it finishes. Results are accumulated
+Iterates over the parser until `done` is called. We don't know in advance how many values are gonna be taken,
+so the `map` call should use single splat operator to receive a list with all values taken in the loop.
 
 ```ruby
 
+ToList = ->(*integers) { integers }
+
 CommaSeparatedInteger = ->(continue, done) do
-  succeed
-    .take(:integer)
+  take(:integer)
     .drop(:spaces)
-    .and_then(:one_of, [
-      succeed.drop(:token, ',').drop(:spaces).and_then(continue),
+    .take(:one_of, [
+      drop(:token, ',').drop(:spaces).and_then(continue),
       done
     ])
 end
 
-ToList = ->(*integers) { integers }
-
 parser = map(ToList).take(:sequence, CommaSeparatedInteger)
 
-parser.call(Comparser::State.new('12, 23, 34')).tap do |state|
-  state.good? # => true
-  state.result # => Result::Good<value: [12, 23, 34]>
-end
+parser.parse('12, 23, 34') # => Good<[12, 23, 34]>
+parser.parse('123')        # => Good<[123]>
+
+parser.parse('12,')        # => Bad<...>
+parser.parse(',12')        # => Bad<...>
 ```
 
 #### `spaces`
@@ -170,13 +165,7 @@ end
 Chompes zero or more blankspaces, line breaks and tabs. Always succeeds.
 
 ```ruby
-parser = succeed.and_then(:spaces)
-
-parser.call(Comparser::State.new('   \nfoo')).tap do |state|
-  state.good?   # => true
-  state.offset  # => 5
-  state.chomped # => '   \n'
-end
+take(:spaces).parse('   \nfoo').state # => State<good?: true, offset: 5, chomped: '   \n'>
 ```
 
 #### `chomp_if`
@@ -184,38 +173,20 @@ end
 Chomps a single character from source if predicate returns true. Otherwise, a bad result is pushed to state.
 
 ```ruby
-parser = succeed.and_then(:chomp_if, ->(ch) { ch == 'a' })
+parser = take(:chomp_if, ->(ch) { ch == 'a' })
 
-parser.call(Comparser::State.new('aaabb')).tap do |state|
-  state.good?   # => true
-  state.offset  # => 1
-  state.chomped # => 'a'
-end
-
-parser.call(Comparser::State.new('bbbcc')).tap do |state|
-  state.bad?    # => true
-  state.offset  # => 0
-  state.chomped # => ''
-end
+parser.parse('aaabb').state # => State<good?: true, offset: 1, chomped: 'a'>
+parser.parse('cccdd').state # => State<good?: false, offset: 0, chomped: ''>
 ```
 
 #### `chomp_while`
 
-Chomps characters from source as long as predicate returns true. This function always leaves the state in a good
-state, even if predicate returns false on the first run. It works as a zero-or-more loop.
+Chomps characters from source as long as predicate returns true. This parser always succeeds even if predicate
+returns false for the first character. It is a zero-or-more loop.
 
 ```ruby
-parser = succeed.and_then(:chomp_while, ->(ch) { ch == 'a' })
+parser = take(:chomp_while, ->(ch) { ch == 'a' })
 
-parser.call(Comparser::State.new('aaabb')).tap do |state|
-  state.good?   # => true
-  state.offset  # => 3
-  state.chomped # => 'aaa'
-end
-
-parser.call(Comparser::State.new('bbbcc')).tap do |state|
-  state.good?   # => true
-  state.offset  # => 0
-  state.chomped # => ''
-end
+parser.parse('aaabb').state # => State<good?: true, offset: 3, chomped: 'aaa'>
+parser.parse('cccdd').state # => State<good?: true, offset: 0, chomped: ''>
 ``````
