@@ -5,13 +5,13 @@ module MyJson
   extend self
 
   def parse(str)
-    expression.call(Comparser::State.new(str)).result
+    value.parse(str)
   end
 
-  def expression
-    succeed.and_then(:one_of, [
-      succeed.and_then(:decimal),
-      succeed.and_then(:double_quoted_string),
+  def value
+    take(:one_of, [
+      take(:decimal),
+      take(:double_quoted_string),
       boolean,
       array,
       object
@@ -25,10 +25,10 @@ module MyJson
         .drop(:spaces)
         .drop(:token, ":")
         .drop(:spaces)
-        .take(expression)
+        .take(value)
         .drop(:spaces)
         .take(:one_of, [
-          succeed.drop(:token, ",").drop(:spaces).and_then(continue),
+          drop(:token, ",").drop(:spaces).and_then(continue),
           done
         ])
     end
@@ -41,9 +41,8 @@ module MyJson
   end
 
   def array
-    comma_separated_expression = ->(continue, done) do
-      succeed
-        .take(expression)
+    comma_separated_values = ->(continue, done) do
+      take(value)
         .drop(:spaces)
         .take(:one_of, [
           succeed.drop(:token, ",").drop(:spaces).and_then(continue),
@@ -54,12 +53,12 @@ module MyJson
     map(->(*values) { values })
       .drop(:token, "[")
       .drop(:spaces)
-      .take(:sequence, comma_separated_expression)
+      .take(:sequence, comma_separated_values)
       .drop(:token, "]")
   end
 
   def boolean
-    succeed.and_then(:one_of, [
+    take(:one_of, [
       map(-> { true }).drop(:token, "true"),
       map(-> { false }).drop(:token, "false")
     ])
