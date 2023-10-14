@@ -14,6 +14,7 @@ and available building blocks you can use to compose more complex and sophistica
   * [`map`](#map)
   * [`one_of`](#one_of)
   * [`sequence`](#sequence)
+  * [`lazy`](#lazy)
   * [`spaces`](#spaces)
   * [`chomp_if`](#chomp_if)
   * [`chomp_while`](#chomp_while)
@@ -168,6 +169,31 @@ CommaSeparatedInteger = ->(continue, done) do
 end
 
 parser = map(ToList).take(:sequence, CommaSeparatedInteger)
+
+parser.parse('12, 23, 34') # => Good<[12, 23, 34]>
+parser.parse('123')        # => Good<[123]>
+
+parser.parse('12,')        # => Bad<...>
+parser.parse(',12')        # => Bad<...>
+```
+
+#### `lazy`
+
+Wraps a parser in a lazy-evaluated proc. Use `lazy` to build recursive parsers.
+
+```ruby
+ToList = ->(*integers) { integers }
+
+CommaSeparatedInteger = -> do
+  take(:integer)
+    .drop(:spaces)
+    .take(:one_of, [
+      drop(:token, ',').drop(:spaces).take(:lazy, CommaSeparatedInteger),
+      succeed
+    ])
+end
+
+parser = map(ToList).take(CommaSeparatedInteger.call())
 
 parser.parse('12, 23, 34') # => Good<[12, 23, 34]>
 parser.parse('123')        # => Good<[123]>
