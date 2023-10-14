@@ -18,42 +18,42 @@ module MyJson
     ])
   end
 
+  CommaSeparatedKeyValuePairs = ->(continue, done) do
+    map(->(key, value) { [key, value] })
+      .take(:double_quoted_string)
+      .drop(:spaces)
+      .drop(:token, ":")
+      .drop(:spaces)
+      .take(value)
+      .drop(:spaces)
+      .take(:one_of, [
+        drop(:token, ",").drop(:spaces).and_then(continue),
+        done
+      ])
+  end
+
   def object
-    comma_separated_kv_pair = ->(continue, done) do
-      map(->(key, value) { [key, value] })
-        .take(:double_quoted_string)
-        .drop(:spaces)
-        .drop(:token, ":")
-        .drop(:spaces)
-        .take(value)
-        .drop(:spaces)
-        .take(:one_of, [
-          drop(:token, ",").drop(:spaces).and_then(continue),
-          done
-        ])
-    end
-    
     map(->(*pairs) { pairs.to_h })
       .drop(:token, "{")
       .drop(:spaces)
-      .take(:sequence, comma_separated_kv_pair)
+      .take(:sequence, CommaSeparatedKeyValuePairs)
       .drop(:token, "}")
   end
 
-  def array
-    comma_separated_values = ->(continue, done) do
-      take(value)
-        .drop(:spaces)
-        .take(:one_of, [
-          succeed.drop(:token, ",").drop(:spaces).and_then(continue),
-          done
-        ])
-    end
+  CommaSeparatedValues = ->(continue, done) do
+    take(value)
+      .drop(:spaces)
+      .take(:one_of, [
+        succeed.drop(:token, ",").drop(:spaces).and_then(continue),
+        done
+      ])
+  end
 
+  def array
     map(->(*values) { values })
       .drop(:token, "[")
       .drop(:spaces)
-      .take(:sequence, comma_separated_values)
+      .take(:sequence, CommaSeparatedValues)
       .drop(:token, "]")
   end
 
