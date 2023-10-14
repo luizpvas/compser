@@ -59,7 +59,7 @@ module MyJson
 
   def number
     take(:one_of, [
-      map(->(x) { x * -1 }).drop(:token, "-").drop(:decimal),
+      map(->(x) { x * -1 }).drop(:token, "-").take(:decimal),
       take(:decimal)
     ])
   end
@@ -71,12 +71,3 @@ module MyJson
     ])
   end
 end
-
-json = <<~JSON
-  {
-    "key": "value",
-    "key2": [true, false, "Hello world", [10, 20], { "key": "value" }]
-  }
-JSON
-
-puts MyJson.parse(json).value.inspect

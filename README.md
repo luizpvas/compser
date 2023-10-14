@@ -1,17 +1,19 @@
 # Comparser
 
-* [`drop`](#drop)
-* [`integer`](#integer)
-* [`decimal`](#decimal)
-* [`token`](#token)
-* [`keyword`](#keyword)
-* [`double_quoted_string`](#double_quoted_string)
-* [`map`](#map)
-* [`one_of`](#one_of)
-* [`sequence`](#sequence)
-* [`spaces`](#spaces)
-* [`chomp_if`](#chomp_if)
-* [`chomp_while`](#chomp_while)
+* Parsers
+  * [`drop`](#drop)
+  * [`integer`](#integer)
+  * [`decimal`](#decimal)
+  * [`token`](#token)
+  * [`keyword`](#keyword)
+  * [`double_quoted_string`](#double_quoted_string)
+  * [`map`](#map)
+  * [`one_of`](#one_of)
+  * [`sequence`](#sequence)
+  * [`spaces`](#spaces)
+  * [`chomp_if`](#chomp_if)
+  * [`chomp_while`](#chomp_while)
+* [Benchmark](#benchmark)
 
 #### `drop`
 
@@ -199,4 +201,18 @@ parser = take(:chomp_while, ->(ch) { ch == 'a' })
 
 parser.parse('aaabb').state # => State<good?: true, offset: 3, chomped: 'aaa'>
 parser.parse('cccdd').state # => State<good?: true, offset: 0, chomped: ''>
-``````
+```
+
+## Benchmark
+
+The following result is a benchark of the [JSON parser](https://github.com/luizpvas/comparser/blob/main/examples/json.rb) I implemented
+with this library. I ran with YJIT enable and disabled, and compare the result against the native `JSON.parse`, implemented in C.
+
+The benchmark parses a 1,5kb payload 5000 times.
+
+Implementation | Time | Difference
+:---:|:---:|:---:
+::JSON.parse | 0.019s | -
+::MyJson.parse (with YJIT) | 9.9s | 526x slower
+::MyJSON.parse | 12.3s | 654x slower
+
