@@ -1,5 +1,9 @@
 # Comparser
 
+Comparser is a parser builder library for Ruby inspired by [elm-parser](https://package.elm-lang.org/packages/elm/parser/latest/).
+Take a look at a [JSON parser](https://github.com/luizpvas/comparser/blob/main/examples/json.rb) implemented with this library to get a feel
+of the syntax.
+
 * Parsers
   * [`drop`](#drop)
   * [`integer`](#integer)
@@ -205,14 +209,13 @@ parser.parse('cccdd').state # => State<good?: true, offset: 0, chomped: ''>
 
 ## Benchmark
 
-The following result is a benchark of the [JSON parser](https://github.com/luizpvas/comparser/blob/main/examples/json.rb) I implemented
-with this library. I ran with YJIT enable and disabled, and compare the result against the native `JSON.parse`, implemented in C.
+The following result is a benchark of a [JSON parser](https://github.com/luizpvas/comparser/blob/main/examples/json.rb) I implemented
+with this library. I ran the benchmark with and without YJIT, and compared the result against the native `JSON.parse`.
 
 The benchmark parses a 1,5kb payload 5000 times.
 
 Implementation | Time | Difference
 :---:|:---:|:---:
-::JSON.parse | 0.019s | -
-::MyJson.parse (with YJIT) | 9.9s | 526x slower
-::MyJSON.parse | 12.3s | 654x slower
-
+`JSON.parse` | 0.019s | -
+`MyJson.parse` (with YJIT) | 9.9s | 526x slower
+`MyJSON.parse` | 12.3s | 654x slower
