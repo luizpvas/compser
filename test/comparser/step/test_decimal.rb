@@ -14,6 +14,15 @@ class Comparser::Step::DecimalTest < Minitest::Test
     end
   end
 
+  def test_decimal_negative_without_floating_point
+    parser = succeed.and_then(:decimal)
+
+    parser.call(State.new("-123")).tap do |state|
+      assert state.good?
+      assert_equal BigDecimal("-123"), state.result.value
+    end
+  end
+
   def test_decimal_with_floating_point
     parser = succeed.and_then(:decimal)
 
@@ -25,6 +34,20 @@ class Comparser::Step::DecimalTest < Minitest::Test
     parser.call(State.new("0.000001")).tap do |state|
       assert state.good?
       assert_equal BigDecimal("0.000001"), state.result.value
+    end
+  end
+
+  def test_decimal_negative_with_floating_point
+    parser = succeed.and_then(:decimal)
+
+    parser.call(State.new("-123.456")).tap do |state|
+      assert state.good?
+      assert_equal BigDecimal("-123.456"), state.result.value
+    end
+
+    parser.call(State.new("-0.000001")).tap do |state|
+      assert state.good?
+      assert_equal BigDecimal("-0.000001"), state.result.value
     end
   end
 

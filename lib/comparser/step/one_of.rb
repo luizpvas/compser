@@ -6,10 +6,11 @@ class Comparser::Step
 
     savepoint = Comparser::Savepoint.new(state)
     
-    branches.each do |branch|
+    branches.each_with_index do |branch, index|
       state = branch.call(state)
 
       return state if state.good? || savepoint.has_changes?
+      return state if index == branches.size - 1 # is last
 
       savepoint.rollback
     end

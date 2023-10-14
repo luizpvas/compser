@@ -8,6 +8,7 @@ class Comparser::Step
     double_quoted_string: DoubleQuotedString,
     integer:              Integer,
     one_of:               OneOf.curry,
+    problem:              Problem.curry,
     sequence:             Sequence.curry,
     spaces:               Spaces,
     token:                Token.curry
