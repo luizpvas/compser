@@ -10,8 +10,8 @@ module MyJson
 
   def value
     take(:one_of, [
-      take(:decimal),
       take(:double_quoted_string),
+      number,
       boolean,
       array,
       object
@@ -55,6 +55,13 @@ module MyJson
       .drop(:spaces)
       .take(:sequence, comma_separated_values)
       .drop(:token, "]")
+  end
+
+  def number
+    take(:one_of, [
+      map(->(x) { x * -1 }).drop(:token, "-").drop(:decimal),
+      take(:decimal)
+    ])
   end
 
   def boolean
