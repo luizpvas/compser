@@ -3,7 +3,7 @@
 require_relative "lib/compser/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "Compser"
+  spec.name = "compser"
   spec.version = Compser::VERSION
   spec.authors = ["Luiz Vasconcellos"]
   spec.email = ["luizpvasc@gmail.com"]
