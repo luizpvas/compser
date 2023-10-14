@@ -1,7 +1,7 @@
-# Comparser
+# Compser
 
-Comparser is a parser builder library for Ruby inspired by [elm-parser](https://package.elm-lang.org/packages/elm/parser/latest/).
-Take a look at the [JSON parser](https://github.com/luizpvas/comparser/blob/main/examples/json.rb) to get a glimpse of the syntax
+Compser is a parser builder library for Ruby inspired by [elm-parser](https://package.elm-lang.org/packages/elm/parser/latest/).
+Take a look at the [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) to get a glimpse of the syntax
 and available building blocks you can use to compose more complex and sophisticated parsers.
 
 * Building blocks
@@ -209,7 +209,7 @@ parser.parse('cccdd').state # => State<good?: true, offset: 0, chomped: ''>
 
 ## Benchmark
 
-The following result is a benchark of a [JSON parser](https://github.com/luizpvas/comparser/blob/main/examples/json.rb) I implemented
+The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) I implemented
 with this library. I ran the benchmark with and without YJIT, and compared the result against the native `JSON.parse`.
 
 The benchmark parses a 1,5kb payload 5000 times.

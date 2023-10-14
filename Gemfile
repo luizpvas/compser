@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in comparser.gemspec
+# Specify your gem's dependencies in Compser.gemspec
 gemspec
 
 gem "rake", "~> 13.0"

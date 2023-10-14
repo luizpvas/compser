@@ -1,7 +1,7 @@
-require_relative "../lib/comparser"
+require_relative "../lib/compser"
 
 module MyJson
-  extend Comparser
+  extend Compser
   extend self
 
   def parse(str)
