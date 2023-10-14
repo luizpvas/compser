@@ -2,7 +2,7 @@
 
 Comparser is a parser builder library for Ruby inspired by [elm-parser](https://package.elm-lang.org/packages/elm/parser/latest/).
 Take a look at the [JSON parser](https://github.com/luizpvas/comparser/blob/main/examples/json.rb) to get a glimpse of the syntax
-and available building blocks you can use to compose sophisticated parsers.
+and available building blocks you can use to compose more complex and sophisticated parsers.
 
 * Building blocks
   * [`drop`](#drop)
