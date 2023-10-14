@@ -19,6 +19,10 @@ class Comparser::Step
     @steps   = []
   end
 
+  def parse(src)
+    call(Comparser::State.new(src)).result
+  end
+
   def call(state)
     results_before = state.result_stack.size
   
