@@ -5,7 +5,7 @@ require "test_helper"
 class Comparser::Step::TestToken < Minitest::Test
   include Comparser
 
-  def test_token_of_one_character
+  def test_token_with_one_character
     parser = succeed.and_then(:token, "a")
 
     parser.call(Comparser::State.new("a")).tap do |state|

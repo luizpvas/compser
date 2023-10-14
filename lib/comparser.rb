@@ -10,6 +10,7 @@ require_relative "comparser/step/decimal"
 require_relative "comparser/step/double_quoted_string"
 require_relative "comparser/step/drop"
 require_relative "comparser/step/integer"
+require_relative "comparser/step/keyword"
 require_relative "comparser/step/one_of"
 require_relative "comparser/step/problem"
 require_relative "comparser/step/sequence"
@@ -24,5 +25,13 @@ module Comparser
 
   def map(mapper)
     Step.new(mapper)
+  end
+
+  def take(...)
+    Step.new.and_then(...)
+  end
+
+  def drop(...)
+    Step.new.drop(...)
   end
 end

@@ -4,6 +4,7 @@
 * [`integer`](#integer)
 * [`decimal`](#decimal)
 * [`token`](#token)
+* [`keyword`] (#keyword)
 * [`double_quoted_string`](#double_quoted_string)
 * [`map`](#map)
 * [`one_of`](#one_of)
@@ -17,10 +18,7 @@
 Discard any result or chomped string produced by the parser.
 
 ```ruby
-parser = succeed
-  .drop(:token, '[')
-  .take(:integer)
-  .drop(:token, ']')
+parser = drop(:token, '[').take(:integer).drop(:token, ']')
 
 parser.parse('[150]') # => Good<150>
 parser.parse('[0]')   # => Good<0>
@@ -35,7 +33,7 @@ parser.parse('[900')  # => Bad<...>
 Parse integers with optional leading `-` for negatives.
 
 ```ruby
-parser = succeed.take(:integer)
+parser = take(:integer)
 
 parser.parse('1')    # => Good<1>
 parser.parse('1234') # => Good<1234>
@@ -52,7 +50,7 @@ parser.parse('0x1A') # => Bad<...>
 Parse floating points as BigDecimal with optional leading `-` for negatives.
 
 ```ruby
-parser = succeed.and_then(:decimal)
+parser = take(:decimal)
 
 parser.parse('0.00009')  # => Good<0.00009>
 parser.parse('-0.00009') # => Good<-0.00009>
@@ -66,7 +64,7 @@ parser.parse('123a')     # => Bad<...>
 Parses the exact string from source.
 
 ```ruby
-parser = succeed.and_then(:token, 'module')
+parser = take(:token, 'module')
 
 
 parser.parse('module')  # => Good<'module'>
@@ -75,12 +73,26 @@ parser.parse('modu')    # => Bad<...>
 parser.parse('Module')  # => Bad<...>
 ```
 
+#### `keyword`
+
+Parses the keyword from source. The next character after the keyword must be a space, symbol or number.
+
+```ruby
+parser = take(:keyword, 'let')
+
+parser.parse('let')  # => Good<'let'>
+
+parser.parse('letter') # => Bad<...>
+parser.parse('Let')    # => Bad<...>
+parser.parse('le')     # => Bad<...>
+```
+
 #### `double_quoted_string`
 
 Parses a string between double quotes ("). Line breaks and tabs inside the string is supported.
 
 ```ruby
-parser = succeed.and_then(:double_quoted_string)
+parser = take(:double_quoted_string)
 
 parser.call(Comparser::State.new('"Hello, world!"')).tap do |state|
   state.good?  # => true

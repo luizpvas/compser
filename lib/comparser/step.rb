@@ -7,6 +7,7 @@ class Comparser::Step
     decimal:              Decimal,
     double_quoted_string: DoubleQuotedString,
     integer:              Integer,
+    keyword:              Keyword.curry,
     one_of:               OneOf.curry,
     problem:              Problem.curry,
     sequence:             Sequence.curry,
