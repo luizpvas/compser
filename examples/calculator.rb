@@ -3,8 +3,8 @@
 require_relative "../lib/compser"
 
 module Compser::Calculator
-  extend Compser
   extend self
+  include Compser
 
   def evaluate(...)
     expression.parse(...)

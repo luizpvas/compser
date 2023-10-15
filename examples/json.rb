@@ -3,8 +3,8 @@
 require_relative "../lib/compser"
 
 module Compser::Json
-  extend Compser
   extend self
+  include Compser
 
   def parse(...)
     value.parse(...)
