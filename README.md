@@ -15,7 +15,6 @@ and available building blocks you can use to compose more complex and sophistica
   * [`one_of`](#one_of)
   * [`sequence`](#sequence)
   * [`lazy`](#lazy)
-  * [`backtrack`](#backtrack)
   * [`spaces`](#spaces)
   * [`chomp_if`](#chomp_if)
   * [`chomp_while`](#chomp_while)

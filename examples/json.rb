@@ -2,7 +2,7 @@
 
 require_relative "../lib/compser"
 
-module MyJson
+module Compser::Json
   extend Compser
   extend self
 

@@ -2,7 +2,6 @@
 
 class Compser::Step
   STEPS = {
-    backtrack:            Backtrack.curry,
     chomp_if:             ChompIf.curry,
     chomp_while:          ChompWhile.curry,
     decimal:              Decimal,
