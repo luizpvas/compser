@@ -5,7 +5,8 @@ Take a look at the [JSON parser](https://github.com/luizpvas/Compser/blob/main/e
 and the building blocks you can sue to compose more complex and sophisticated parsers.
 
 * [Installation](#installation)
-* Building blocks
+* [Benchmark](#benchmark)
+* [Building blocks](#building_blocks)
   * [`drop`](#drop)
   * [`integer`](#integer)
   * [`decimal`](#decimal)
@@ -19,7 +20,6 @@ and the building blocks you can sue to compose more complex and sophisticated pa
   * [`spaces`](#spaces)
   * [`chomp_if`](#chomp_if)
   * [`chomp_while`](#chomp_while)
-* [Benchmark](#benchmark)
 
 ## Installation
 
@@ -29,7 +29,24 @@ Add the following line to your Gemfile:
 gem 'compser', '~> 0.2'
 ```
 
-See more details at [https://rubygems.org/gems/compser](https://rubygems.org/gems/compser).
+More details at [https://rubygems.org/gems/compser](https://rubygems.org/gems/compser).
+
+## Benchmark
+
+The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) I implemented
+with this library. I ran the benchmark with and without YJIT, and compared the result against `JSON.parse` (native C implementation) and [Parsby](https://github.com/jolmg/parsby).
+
+[The benchmark](https://github.com/luizpvas/compser/blob/main/examples/json-benchmark.rb) parses a 1,5kb payload 100 times.
+
+Implementation | Time | Comparison to `JSON.parse`
+:---:|:---:|:---:
+`JSON.parse`                              | 0.00067s | -
+`Compser::Json.parse` (with YJIT)         | 0.216s   | 322x slower
+`Compser::Json.parse`                     | 0.268s   | 400x slower
+`Parsby::Example::JsonParser` (with YJIT) | 24.19s   | 36100x slower
+`Parsby::Example::JsonParser`             | 27.22s   | 40626x slower
+
+## Building blocks
 
 #### `drop`
 
@@ -243,18 +260,3 @@ parser = take(:chomp_while, ->(ch) { ch == 'a' })
 parser.parse('aaabb').state # => State<good?: true, offset: 3, chomped: 'aaa'>
 parser.parse('cccdd').state # => State<good?: true, offset: 0, chomped: ''>
 ```
-
-## Benchmark
-
-The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) I implemented
-with this library. I ran the benchmark with and without YJIT, and compared the result against `JSON.parse` (native C implementation) and [Parsby](https://github.com/jolmg/parsby).
-
-[The benchmark](https://github.com/luizpvas/compser/blob/main/examples/json-benchmark.rb) parses a 1,5kb payload 100 times.
-
-Implementation | Time | Comparison to `JSON.parse`
-:---:|:---:|:---:
-`JSON.parse`                              | 0.00067s | -
-`Compser::Json.parse` (with YJIT)         | 0.216s   | 322x slower
-`Compser::Json.parse`                     | 0.268s   | 400x slower
-`Parsby::Example::JsonParser` (with YJIT) | 24.19s   | 36100x slower
-`Parsby::Example::JsonParser`             | 27.22s   | 40626x slower
