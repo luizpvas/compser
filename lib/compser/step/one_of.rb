@@ -9,7 +9,7 @@ class Compser::Step
     branches.each_with_index do |branch, index|
       state = branch.call(state)
 
-      return state if state.good? || savepoint.has_changes?
+      return state if savepoint.has_changes?
       return state if index == branches.size - 1 # is last
 
       savepoint.rollback

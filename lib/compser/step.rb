@@ -2,6 +2,7 @@
 
 class Compser::Step
   STEPS = {
+    backtrack:            Backtrack.curry,
     chomp_if:             ChompIf.curry,
     chomp_while:          ChompWhile.curry,
     decimal:              Decimal,
@@ -50,11 +51,11 @@ class Compser::Step
 
     step =
       case first
-      when Proc            then first
+      when Proc          then first
       when Compser::Step then first
-      when Symbol          then STEPS.fetch(args.first).call(*rest)
-      when nil             then block ? block : raise(ArgumentError, "expected a callable") 
-      else                 raise ArgumentError, "expected a callable, got #{args.inspect}"
+      when Symbol        then STEPS.fetch(args.first).call(*rest)
+      when nil           then block ? block : raise(ArgumentError, "expected a callable") 
+      else               raise ArgumentError, "expected a callable, got #{args.inspect}"
       end
 
     @steps << step
@@ -69,11 +70,11 @@ class Compser::Step
 
     step =
       case first
-      when Proc            then Drop.(first)
+      when Proc          then Drop.(first)
       when Compser::Step then Drop.(first)
-      when Symbol          then Drop.(STEPS.fetch(first).call(*rest))
-      when nil             then block ? Drop.(block) : raise(ArgumentError, "expected a callable") 
-      else                 raise ArgumentError, "expected a callable"
+      when Symbol        then Drop.(STEPS.fetch(first).call(*rest))
+      when nil           then block ? Drop.(block) : raise(ArgumentError, "expected a callable") 
+      else               raise ArgumentError, "expected a callable"
       end
 
     @steps << step

@@ -15,6 +15,7 @@ and available building blocks you can use to compose more complex and sophistica
   * [`one_of`](#one_of)
   * [`sequence`](#sequence)
   * [`lazy`](#lazy)
+  * [`backtrack`](#backtrack)
   * [`spaces`](#spaces)
   * [`chomp_if`](#chomp_if)
   * [`chomp_while`](#chomp_while)
@@ -236,12 +237,14 @@ parser.parse('cccdd').state # => State<good?: true, offset: 0, chomped: ''>
 ## Benchmark
 
 The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) I implemented
-with this library. I ran the benchmark with and without YJIT, and compared the result against the native `JSON.parse`.
+with this library. I ran the benchmark with and without YJIT, and compared the result against `JSON.parse` (native C implementation) and [Parsby](https://github.com/jolmg/parsby).
 
-The benchmark parses a 1,5kb payload 5000 times.
+[The benchmark](https://github.com/luizpvas/compser/blob/main/examples/json-benchmark.rb) parses a 1,5kb payload 100 times.
 
-Implementation | Time | Difference
+Implementation | Time | Comparison to native `JSON.parse`
 :---:|:---:|:---:
-`JSON.parse` | 0.019s | -
-`MyJson.parse` (with YJIT) | 9.9s | 526x slower
-`MyJSON.parse` | 12.3s | 654x slower
+`JSON.parse`                              | 0.00067s | -
+`Compser::Json.parse` (with YJIT)         | 0.216s   | 322x slower
+`Compser::Json.parse`                     | 0.268s   | 400x slower
+`Parsby::Example::JsonParser` (with YJIT) | 24.19s   | 36100x slower
+`Parsby::Example::JsonParser`             | 27.22s   | 40626x slower

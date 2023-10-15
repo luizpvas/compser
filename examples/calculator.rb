@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
+require_relative "../lib/compser"
+
 module Calculator
-  extend Composer
+  extend Compser
   extend self
 
   def evaluate(...)
@@ -10,17 +12,30 @@ module Calculator
 
   def expression
     take(:one_of, [
+      backtrack(operation),
       number
     ])
   end
 
-  def sum
-    map(->(a, b) { a + b })
+  OPERATORS = {
+    "+" => ->(a, b) { a + b },
+    "-" => ->(a, b) { a - b }
+  }.freeze
+
+  Evaluate = ->(a, op, b) { OPERATORS.fetch(op).call(a, b) }
+
+  def operation
+    map(Evaluate)
       .take(number)
       .drop(:spaces)
-      .drop(:token, "+")
-      .drop(:spaces)
-      .take(:lazy, -> { expression })
+      .take(:one_of, [
+        take(:token, "+")
+          .drop(:spaces)
+          .take(:lazy, -> { expression }),
+        take(:token, "-")
+          .drop(:spaces)
+          .take(:lazy, -> { expression })
+      ])
   end
 
   def number
@@ -30,3 +45,5 @@ module Calculator
     ])
   end
 end
+
+puts Calculator.evaluate("10 + 10").value.to_s

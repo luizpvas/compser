@@ -16,26 +16,39 @@ class Compser::Step::TestOneOf < Minitest::Test
   end
 
   def test_one_of_succeeds_first_branch
-    parser = succeed.and_then(:one_of, [
-      ->(state) { state.good!("foo") },
-      ->(state) { state.good!("bar") },
+    parser = take(:one_of, [
+      take(:token, "1"),
+      take(:token, "2")
     ])
 
-    parser.call(State.new(nil)).tap do |state|
-      assert state.good?
-      assert_equal "foo", state.result.value
+    parser.parse("1").tap do |result|
+      assert result.good?
+      assert_equal "1", result.value
     end
   end
 
   def test_one_of_succeeds_second_branch
     parser = succeed.and_then(:one_of, [
-      ->(state) { state.bad!("foo") },
-      ->(state) { state.good!("bar") },
+      take(:token, "1"),
+      take(:token, "2")
     ])
 
-    parser.call(State.new(nil)).tap do |state|
-      assert state.good?
-      assert_equal "bar", state.result.value
+    parser.parse("2").tap do |result|
+      assert result.good?
+      assert_equal "2", result.value
+    end
+  end
+
+
+  def test_one_of_continues_to_next_branch_on_success_without_change
+    parser = take(:one_of, [
+      succeed,
+      take(:integer)
+    ])
+
+    parser.parse("123").tap do |result|
+      assert result.good?
+      assert_equal 123, result.value
     end
   end
 
