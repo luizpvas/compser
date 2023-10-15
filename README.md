@@ -33,12 +33,11 @@ More details at [https://rubygems.org/gems/compser](https://rubygems.org/gems/co
 
 ## Benchmark
 
-The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) I implemented
-with this library. I ran the benchmark with and without YJIT, and compared the result against `JSON.parse` (native C implementation) and [Parsby](https://github.com/jolmg/parsby).
+The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) implemented with this library compared against [Parsby](https://github.com/jolmg/parsby) and the native `JSON.parse`.
 
 [The benchmark](https://github.com/luizpvas/compser/blob/main/examples/json-benchmark.rb) parses a 1,5kb payload 100 times.
 
-Implementation | Time | Comparison to `JSON.parse`
+Implementation | Time | Compared to `JSON.parse`
 :---:|:---:|:---:
 `JSON.parse`                              | 0.00067s | -
 `Compser::Json.parse` (with YJIT)         | 0.216s   | 322x slower
