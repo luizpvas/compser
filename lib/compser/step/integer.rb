@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class Compser::Step
-  IsDigit = ->(char) do
-    char =~ /\d/
-  end
+  DIGIT = /\d/.freeze
+
+  IsDigit = ->(ch) { DIGIT.match?(ch) }
 
   NotFollowedByAlpha = ->(state) do
     return state if state.eof?
