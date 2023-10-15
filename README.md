@@ -2,7 +2,7 @@
 
 Compser is a parser library for Ruby inspired by [elm-parser](https://package.elm-lang.org/packages/elm/parser/latest/).
 Take a look at the [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) and [Calculator](https://github.com/luizpvas/compser/blob/main/examples/calculator.rb) to get a glimpse of the syntax
-and the building blocks you can sue to compose more complex and sophisticated parsers.
+and the building blocks you can use to compose more complex and sophisticated parsers.
 
 * [Installation](#installation)
 * [Benchmark](#benchmark)
@@ -33,7 +33,7 @@ More details at [https://rubygems.org/gems/compser](https://rubygems.org/gems/co
 
 ## Benchmark
 
-The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) implemented with this library compared against [Parsby](https://github.com/jolmg/parsby) and the native `JSON.parse`.
+The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) implemented with this library compared against [Parsby](https://github.com/jolmg/parsby) and `JSON.parse` (native C implementation).
 
 [The benchmark](https://github.com/luizpvas/compser/blob/main/examples/json-benchmark.rb) parses a 1,5kb payload 100 times.
 
