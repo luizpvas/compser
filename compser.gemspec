@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["Luiz Vasconcellos"]
   spec.email = ["luizpvasc@gmail.com"]
 
-  spec.summary = "Compser is a parser builder library for Ruby."
+  spec.summary = "Compser is a parser library for Ruby inspired by elm-parser."
   spec.homepage = "https://github.com/luizpvas/compser"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2.0"

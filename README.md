@@ -4,6 +4,7 @@ Compser is a parser library for Ruby inspired by [elm-parser](https://package.el
 Take a look at the [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) and [Calculator](https://github.com/luizpvas/compser/blob/main/examples/calculator.rb) to get a glimpse of the syntax
 and the building blocks you can sue to compose more complex and sophisticated parsers.
 
+* [Installation](#installation)
 * Building blocks
   * [`drop`](#drop)
   * [`integer`](#integer)
@@ -19,6 +20,16 @@ and the building blocks you can sue to compose more complex and sophisticated pa
   * [`chomp_if`](#chomp_if)
   * [`chomp_while`](#chomp_while)
 * [Benchmark](#benchmark)
+
+## Installation
+
+Add the following line to your Gemfile:
+
+```ruby
+gem 'compser', '~> 0.2'
+```
+
+See more details at [https://rubygems.org/gems/compser](https://rubygems.org/gems/compser).
 
 #### `drop`
 
