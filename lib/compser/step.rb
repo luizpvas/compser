@@ -16,9 +16,9 @@ class Compser::Step
     token:                Token.curry
   }.freeze
 
-  def initialize(mapper = nil)
-    @mapper = mapper
-    @steps   = []
+  def initialize(to_value = nil)
+    @to_value = to_value
+    @steps    = []
   end
 
   def parse(src)
@@ -36,10 +36,10 @@ class Compser::Step
 
     results_after = state.result_stack.size
 
-    if @mapper && state.good?
+    if @to_value && state.good?
       args = state.pop_results(results_after - results_before).map(&:value)
 
-      state.good!(@mapper.call(*args))
+      state.good!(@to_value.call(*args))
     end
 
     state

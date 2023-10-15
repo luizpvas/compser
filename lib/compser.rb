@@ -24,12 +24,12 @@ module Compser
     Step.new
   end
 
-  def map(mapper)
-    Step.new(mapper)
+  def map(to_value)
+    Step.new(to_value)
   end
 
   def take(...)
-    Step.new.and_then(...)
+    Step.new.take(...)
   end
 
   def drop(...)
