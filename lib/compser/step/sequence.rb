@@ -16,11 +16,8 @@ class Compser::Step
       state = helper.call(continue, done).call(state)
     end
 
-    return state if state.bad?
-
-    if state.good? && state.__sequence__ == DONE
-      return state
-    end
+    return if state.bad?
+    return if state.__sequence__ == DONE
 
     state.bad!("unbound sequence")
   end

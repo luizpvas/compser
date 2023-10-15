@@ -7,7 +7,5 @@ class Compser::Step
     parser.call(state)
 
     savepoint.rollback if state.bad?
-
-    state
   end
 end

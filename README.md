@@ -241,7 +241,7 @@ with this library. I ran the benchmark with and without YJIT, and compared the r
 
 [The benchmark](https://github.com/luizpvas/compser/blob/main/examples/json-benchmark.rb) parses a 1,5kb payload 100 times.
 
-Implementation | Time | Comparison to native `JSON.parse`
+Implementation | Time | Comparison to `JSON.parse`
 :---:|:---:|:---:
 `JSON.parse`                              | 0.00067s | -
 `Compser::Json.parse` (with YJIT)         | 0.216s   | 322x slower

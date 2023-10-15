@@ -9,7 +9,7 @@ class Compser::State
     @line = 0
     @column = 0
     @chomped = ::String.new("")
-    @result_stack = [Compser::Result::Good.new(self, nil)]
+    @result_stack = [Compser::Result::Good.new(nil)]
   end
 
   def result
@@ -76,12 +76,12 @@ class Compser::State
   def good(value)
     return value if value.is_a?(Compser::Result::Good)
 
-    Compser::Result::Good.new(self, value)
+    Compser::Result::Good.new(value)
   end
 
   def bad(message)
     return message if message.is_a?(Compser::Result::Bad)
 
-    Compser::Result::Bad.new(self, message)
+    Compser::Result::Bad.new(message)
   end
 end

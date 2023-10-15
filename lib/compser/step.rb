@@ -29,7 +29,7 @@ class Compser::Step
   def call(state)
     results_before = state.result_stack.size
   
-    state = @steps.reduce(state) do |state, step|
+    @steps.each do |step|
       return state if state.bad?
 
       step.call(state)
