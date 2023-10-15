@@ -6,8 +6,8 @@ module Compser::Json
   extend Compser
   extend self
 
-  def parse(str)
-    value.parse(str)
+  def parse(...)
+    value.parse(...)
   end
 
   def value
