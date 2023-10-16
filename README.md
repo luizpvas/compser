@@ -238,7 +238,7 @@ parser.parse(',12')        # => Bad<...>
 Chompes zero or more blankspaces, line breaks and tabs. Always succeeds.
 
 ```ruby
-take(:spaces).parse('   \nfoo').state # => State<good?: true, offset: 5, chomped: '   \n'>
+Compser::State.new('   \nfoo').tap { take(:spaces).call(_1) } # => State<good?: true, offset: 5, chomped: '   \n'>
 ```
 
 #### `chomp_if`
@@ -248,8 +248,8 @@ Chomps a single character from source if predicate returns true. Otherwise, a ba
 ```ruby
 parser = take(:chomp_if, ->(ch) { ch == 'a' })
 
-parser.parse('aaabb').state # => State<good?: true, offset: 1, chomped: 'a'>
-parser.parse('cccdd').state # => State<good?: false, offset: 0, chomped: ''>
+Compser::State.new('aaabb').tap { parser.call(_1) } # => State<good?: true, offset: 1, chomped: 'a'>
+Compser::State.new('cccdd').tap { parser.call(_1) } # => State<good?: false, offset: 0, chomped: ''>
 ```
 
 #### `chomp_while`
@@ -260,6 +260,6 @@ returns false for the first character. It is a zero-or-more loop.
 ```ruby
 parser = take(:chomp_while, ->(ch) { ch == 'a' })
 
-parser.parse('aaabb').state # => State<good?: true, offset: 3, chomped: 'aaa'>
-parser.parse('cccdd').state # => State<good?: true, offset: 0, chomped: ''>
+Compser::State.new('aaabb').tap { parser.call(_1) } # => State<good?: true, offset: 3, chomped: 'aaa'>
+Compser::State.new('cccdd').tap { parser.call(_1) } # => State<good?: true, offset: 0, chomped: ''>
 ```
