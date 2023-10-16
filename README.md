@@ -33,7 +33,7 @@ More details at [https://rubygems.org/gems/compser](https://rubygems.org/gems/co
 
 ## Benchmark
 
-The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) implemented with this library compared against [Parsby](https://github.com/jolmg/parsby) and `JSON.parse`.
+The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) implemented with this library compared against [Parsby](https://github.com/jolmg/parsby), [Parslet](https://github.com/kschiess/parslet) and `JSON.parse`.
 
 [The benchmark](https://github.com/luizpvas/compser/blob/main/examples/json_benchmark.rb) parses a 1,5kb payload 100 times.
 
