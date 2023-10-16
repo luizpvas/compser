@@ -53,7 +53,7 @@ Compser is far behind `JSON.parse` with the native C implementation, but results
 
 #### `drop`
 
-Discard any result or chomped string produced by the parser.
+Discard results produced by the parser.
 
 ```ruby
 parser = drop(:token, '[').take(:integer).drop(:token, ']')
