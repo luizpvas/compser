@@ -47,7 +47,7 @@ Implementation | Time | Compared to `JSON.parse`
 [`Parsby::Example::JsonParser`](https://github.com/jolmg/parsby/blob/master/lib/parsby/example/json_parser.rb) with YJIT | 24.19s | 36100x slower
 [`Parsby::Example::JsonParser`](https://github.com/jolmg/parsby/blob/master/lib/parsby/example/json_parser.rb) | 27.22s | 40626x slower
 
-Compser is nowhere near the native C implementation in `JSON.parse`, but results seem pretty good compared to other Ruby implementations.
+Compser is far behind `JSON.parse` with the native C implementation, but results seem pretty good compared to other Ruby implementations.
 
 ## Building blocks
 
