@@ -123,7 +123,7 @@ parser.parse('Module')  # => Bad<...>
 
 #### `keyword`
 
-Parses the keyword from source. The next character after the keyword must be a space, symbol or number.
+Parses the keyword from source. Similar to `token`, but the next character after the keyword must be a space, symbol or number.
 
 ```ruby
 parser = take(:keyword, 'let')
