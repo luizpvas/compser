@@ -6,7 +6,7 @@ and the building blocks you can use to compose more complex and sophisticated pa
 
 * [Installation](#installation)
 * [Benchmark](#benchmark)
-* [Building blocks](#building_blocks)
+* [Building blocks](#building-blocks)
   * [`drop`](#drop)
   * [`integer`](#integer)
   * [`decimal`](#decimal)
