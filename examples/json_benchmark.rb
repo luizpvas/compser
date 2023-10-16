@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "json"
+require_relative "parslet_json"
 require "json"
 require "benchmark"
 require "stringio"
@@ -15,8 +16,9 @@ n = 100
 
 Benchmark.bm do |x|
   x.report("Compser::Json.parse") { n.times do; Compser::Json.parse(json); end }
-  x.report("JSON.parse")   { n.times do; ::JSON.parse(json); end }
-  x.report("Parsby")       { n.times do; Parsby::Example::JsonParser.parse(json); end }
+  x.report("JSON.parse")          { n.times do; JSON.parse(json); end }
+  x.report("Parslet")             { n.times do; Parslet::Json.parse(json); end }
+  x.report("Parsby")              { n.times do; Parsby::Example::JsonParser.parse(json); end }
 end
 
 puts RubyVM::YJIT.runtime_stats

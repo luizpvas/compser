@@ -33,17 +33,21 @@ More details at [https://rubygems.org/gems/compser](https://rubygems.org/gems/co
 
 ## Benchmark
 
-The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) implemented with this library compared against [Parsby](https://github.com/jolmg/parsby) and `JSON.parse` (native C implementation).
+The following result is a benchark of a [JSON parser](https://github.com/luizpvas/Compser/blob/main/examples/json.rb) implemented with this library compared against [Parsby](https://github.com/jolmg/parsby) and `JSON.parse`.
 
-[The benchmark](https://github.com/luizpvas/compser/blob/main/examples/json-benchmark.rb) parses a 1,5kb payload 100 times.
+[The benchmark](https://github.com/luizpvas/compser/blob/main/examples/json_benchmark.rb) parses a 1,5kb payload 100 times.
 
 Implementation | Time | Compared to `JSON.parse`
 :---:|:---:|:---:
-`JSON.parse`                              | 0.00067s | -
-`Compser::Json.parse` (with YJIT)         | 0.216s   | 322x slower
-`Compser::Json.parse`                     | 0.268s   | 400x slower
-`Parsby::Example::JsonParser` (with YJIT) | 24.19s   | 36100x slower
-`Parsby::Example::JsonParser`             | 27.22s   | 40626x slower
+`JSON.parse` | 0.00067s | -
+[`Compser::Json`](https://github.com/luizpvas/compser/blob/main/examples/json.rb) with YJIT | 0.216s | 322x slower
+[`Compser::Json`](https://github.com/luizpvas/compser/blob/main/examples/json.rb) | 0.268s | 400x slower
+[`Parslet::MyJson`](https://github.com/kschiess/parslet/blob/master/example/json.rb) with YJIT | 0.43s | 641x slower
+[`Parslet::MyJson`](https://github.com/kschiess/parslet/blob/master/example/json.rb) | 0.57s | 850x slower
+[`Parsby::Example::JsonParser`](https://github.com/jolmg/parsby/blob/master/lib/parsby/example/json_parser.rb) with YJIT | 24.19s | 36100x slower
+[`Parsby::Example::JsonParser`](https://github.com/jolmg/parsby/blob/master/lib/parsby/example/json_parser.rb) | 27.22s | 40626x slower
+
+Compser is nowhere near the native C implementation in `JSON.parse`, but results seem pretty good compared to other Ruby implementations.
 
 ## Building blocks
 
