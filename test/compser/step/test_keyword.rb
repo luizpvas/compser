@@ -49,4 +49,14 @@ class Compser::Step::TestKeyword < Minitest::Test
       assert_equal "expected keyword \"foo\"", result.message
     end
   end
+
+  def test_keyword_chomp_consumption
+    parser = take(:keyword, "foo")
+
+    parser.call(State.new("foo")).tap do |state|
+      assert state.good?
+      assert_equal "foo", state.result.value
+      assert_equal "", state.chomped
+    end
+  end
 end

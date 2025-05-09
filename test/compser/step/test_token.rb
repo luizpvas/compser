@@ -49,4 +49,14 @@ class Compser::Step::TestToken < Minitest::Test
       assert_equal "expected \"foo\"", state.result.message
     end
   end
+
+  def test_token_chomp_consumption
+    parser = take(:token, "foo")
+
+    parser.call(Compser::State.new("foo")).tap do |state|
+      assert state.good?
+      assert_equal "foo", state.result.value
+      assert_equal "", state.chomped
+    end
+  end
 end

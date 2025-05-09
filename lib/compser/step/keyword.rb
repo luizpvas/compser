@@ -7,7 +7,7 @@ class Compser::Step
     if has_token
       str.size.times { state.chomp }
 
-      return state.good!(str) if state.eof? || !state.peek.match?(/[[:alpha:]]/)
+      return state.good!(state.consume_chomped) if state.eof? || !state.peek.match?(/[[:alpha:]]/)
     end
 
     state.bad!("expected keyword #{str.inspect}")
