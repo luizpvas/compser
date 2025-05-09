@@ -12,6 +12,7 @@ and building blocks you can use to build complex parsers.
   * [`decimal`](#decimal)
   * [`token`](#token)
   * [`keyword`](#keyword)
+  * [`keywordi`](#keywordi)
   * [`double_quoted_string`](#double_quoted_string)
   * [`map`](#map)
   * [`one_of`](#one_of)
@@ -133,6 +134,20 @@ parser.parse('let')  # => Good<'let'>
 parser.parse('letter') # => Bad<...>
 parser.parse('Let')    # => Bad<...>
 parser.parse('le')     # => Bad<...>
+```
+
+#### `keywordi`
+
+Case insensitive version of `keyword`
+
+```ruby
+parser = take(:keywordi, 'select')
+
+parser.parse('SELECT')  # => Good<'SELECT'>
+
+parser.parse('SELECT1') # => Bad<...>
+parser.parse('selec')   # => Bad<...>
+parser.parse('Sele ct') # => Bad<...>
 ```
 
 #### `double_quoted_string`
