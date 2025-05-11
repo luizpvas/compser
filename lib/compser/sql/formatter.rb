@@ -39,13 +39,20 @@ module Compser::SQL
         write name
       
       in [:aliased, result, name]
-        call(result)
-        write " AS "
-        call(name)
+        call(result) and write " AS " and call(name)
 
-      in [:from, name]
+      in [:from, name, join]
         unindent and write "FROM" and newline and indent
-        call(name)
+        call(name) and newline
+        call(join)
+
+      in [:inner_join, related, left, operator, right]
+        unindent and write "INNER JOIN" and newline and indent
+        call(related) and space
+        write "ON" and space
+        call(left) and space
+        write operator and space
+        call(right)
 
       in nil
         nil
@@ -64,6 +71,10 @@ module Compser::SQL
 
     def newline
       @output += "\n"
+    end
+
+    def space
+      @output += " "
     end
 
     def indent

@@ -45,11 +45,32 @@ module Compser::SQL
     end
 
     def from
-      map(->(name) { [:from, name] })
+      map(->(name, join) { [:from, name, join] })
         .drop(:keywordi, "from")
         .drop(:spaces)
         .take(name)
         .drop(:spaces)
+        .take(:one_of, [
+          inner_join,
+          -> { _1.good!(nil) }
+        ])
+    end
+
+    def inner_join
+      map(->(related, left, right) { [:inner_join, related, left, "=", right] })
+        .drop(:keywordi, "inner")
+        .drop(:spaces)
+        .drop(:keywordi, "join")
+        .drop(:spaces)
+        .take(name)
+        .drop(:spaces)
+        .drop(:keywordi, "on")
+        .drop(:spaces)
+        .take(name)
+        .drop(:spaces)
+        .drop(:token, "=")
+        .drop(:spaces)
+        .take(name)
     end
 
     def integer

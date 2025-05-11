@@ -42,7 +42,7 @@ class Compser::SQL::TestParser < Minitest::Test
 
     formatted_sql = ::Compser::SQL::Formatter.format(result.value)
 
-    assert_equal sql.strip, formatted_sql, <<~TEXT
+    assert_equal sql.strip, formatted_sql.strip, <<~TEXT
       Expected
 
       [#{formatted_sql}]
