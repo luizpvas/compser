@@ -6,15 +6,18 @@ module Compser::SQL
     include ::Compser
 
     def parse(text)
-      expression.parse(text)
+      select.parse(text)
     end
 
-    def expression
-      select
+    def select
+      map(->(*results) { [:select, results] })
+        .drop(:keywordi, "select")
+        .drop(:spaces)
+        .take(:sequence, CommaSeparatedResults)
     end
 
-    CommaSeparatedResultColumn = ->(continue, done) do
-      result_column
+    CommaSeparatedResults = ->(continue, done) do
+      result
         .drop(:spaces)
         .take(:one_of, [
           drop(:token, ",").drop(:spaces).and_then(continue),
@@ -22,19 +25,18 @@ module Compser::SQL
         ])
     end
 
-    def select
-      map(->(*result_columns) { [:select, result_columns] })
-        .drop(:keywordi, "select")
+    def result
+      map(->(result, as) { as.nil? ? result : [:aliased, result, as] })
+        .take(:one_of, [ integer ])
         .drop(:spaces)
-        .take(:sequence, CommaSeparatedResultColumn)
-    end
-
-    def result_column
-      take(:one_of, [ integer ])
+        .take(:one_of, [
+          drop(:keywordi, "as").drop(:spaces).take(name),
+          ->(state) { state.good!(nil) }
+        ])
     end
 
     IsChar = ->(c) { c.match?(/[a-zA-Z]/) }
-    IsAlpha = ->(c) { c.match?(/[[:alpha:]]/) }
+    IsAlpha = ->(c) { c.match?(/[a-zA-Z0-9]/) }
 
     def name
       succeed

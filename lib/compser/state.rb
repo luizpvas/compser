@@ -23,8 +23,8 @@ class Compser::State
   def peek(i = 0, n = 1)
     peek_offset = @offset + i
 
-    return if peek_offset < 0
-    return if peek_offset + n - 1 >= @source_code.length
+    return "" if peek_offset < 0
+    return "" if peek_offset + n - 1 >= @source_code.length
 
     return @source_code[peek_offset, n]
   end
