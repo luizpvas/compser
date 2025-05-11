@@ -1,37 +1,77 @@
 # frozen_string_literal: true
 
 module Compser::SQL
-  module Formatter
-    extend self
+  class Formatter
+    def self.format(ast)
+      formatter = new
+      formatter.call(ast)
+      formatter.output.strip
+    end
 
-    AddCommas = ->(results) do
-      results.map.with_index do |result, index|
-        is_last = index == results.size - 1
+    attr_reader :output
 
-        is_last ? result : "#{result},"
+    def initialize
+      @output = ""
+      @indent = 0
+    end
+
+    def call(term)
+      case term
+      in [:select, results, from]
+        write "SELECT" and newline and indent
+
+        results.map.with_index do |result, index|
+          call(result)
+
+          if index == results.size - 1
+            newline
+          else
+            write "," and newline
+          end
+        end
+
+        call(from)
+
+      in [:integer, literal]
+        write literal.to_s
+
+      in [:name, name]
+        write name
+      
+      in [:aliased, result, name]
+        call(result)
+        write " AS "
+        call(name)
+
+      in [:from, name]
+        unindent and write "FROM" and newline and indent
+        call(name)
+
+      in nil
+        nil
       end
     end
 
-    Indent = ->(indent, lines) do
-      spaces = " " * indent
+    private
 
-      lines.map { spaces + _1 }.join("\n")
+    def write(str)
+      if @output.end_with?("\n")
+        @output += (" " * @indent) + str
+      else
+        @output += str
+      end
     end
 
-    Indent0 = Indent.curry[0]
-    Indent2 = Indent.curry[2]
+    def newline
+      @output += "\n"
+    end
 
-    Format = ->(data) do
-      case data
-      in [:select, results]
-        formatted_results = results.map(&Format).then(&AddCommas)
+    def indent
+      @indent += 2
+    end
 
-        Indent0[["SELECT", Indent2[formatted_results]]]
-      in [:aliased, result, as]
-        Format[result] + " AS " + as
-      in [:integer, value]
-        value.to_s
-      end
+    def unindent
+      @indent -= 2
     end
   end
 end
