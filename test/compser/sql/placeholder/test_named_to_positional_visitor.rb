@@ -3,7 +3,7 @@
 require "test_helper"
 
 class Compser::SQL::Placeholder::TestNamedToPositionalVisitor < Minitest::Test
-  def test_named_to_positional_visitor
+  def test_one_named_placeholder
     positional_placeholders, sql =
       replace_named_placeholders_with_positional_placeholders <<~SQL
         SELECT * FROM users WHERE role = :role
@@ -19,6 +19,61 @@ class Compser::SQL::Placeholder::TestNamedToPositionalVisitor < Minitest::Test
         users
       WHERE
         role = $1
+    SQL
+  end
+
+  def test_two_named_placeholders
+    positional_placeholders, sql =
+      replace_named_placeholders_with_positional_placeholders <<~SQL
+        SELECT * FROM users WHERE role = :role AND id = :id
+      SQL
+
+    assert_equal 2, positional_placeholders.size
+    assert_equal 1, positional_placeholders["role"]
+    assert_equal 2, positional_placeholders["id"]
+
+    assert_equal <<~SQL.strip, sql
+      SELECT
+        *
+      FROM
+        users
+      WHERE
+        role = $1 AND id = $2
+    SQL
+  end
+
+  def test_named_placeholder_repeated_twice
+    positional_placeholders, sql =
+      replace_named_placeholders_with_positional_placeholders <<~SQL
+        SELECT * FROM users WHERE role = :role AND id = :role
+      SQL
+
+    assert_equal 1, positional_placeholders.size
+    assert_equal 1, positional_placeholders["role"]
+
+    assert_equal <<~SQL.strip, sql
+      SELECT
+        *
+      FROM
+        users
+      WHERE
+        role = $1 AND id = $1
+    SQL
+  end
+
+  def test_no_named_placeholders
+    positional_placeholders, sql =
+      replace_named_placeholders_with_positional_placeholders <<~SQL
+        SELECT * FROM users
+      SQL
+
+    assert_equal 0, positional_placeholders.size
+
+    assert_equal <<~SQL.strip, sql
+      SELECT
+        *
+      FROM
+        users
     SQL
   end
 
