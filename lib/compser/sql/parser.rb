@@ -25,7 +25,7 @@ module Compser::SQL
     end
 
     def result_columns
-      map(->(*args) { args })
+      map(->(*values) { values })
         .take(:sequence, ->(continue, done) do
           result_column
             .drop(:spaces)
