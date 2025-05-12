@@ -8,6 +8,7 @@ class Compser::Step
     double_quoted_string: DoubleQuotedString,
     integer:              Integer,
     keyword:              Keyword.curry,
+    keywordi:             Keywordi.curry,
     lazy:                 Lazy.curry,
     one_of:               OneOf.curry,
     problem:              Problem.curry,

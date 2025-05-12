@@ -7,7 +7,7 @@ class Compser::Step
     if has_token
       str.size.times { state.chomp }
 
-      return state.good!(str)
+      return state.good!(state.consume_chomped)
     end
 
     state.bad!("expected #{str.inspect}")

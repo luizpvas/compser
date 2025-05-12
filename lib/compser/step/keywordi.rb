@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class Compser::Step
-  Keyword = ->(str, state) do
-    has_token = state.peek(0, str.size) == str
+  Keywordi = ->(str, state) do
+    has_token = state.peek(0, str.size).downcase == str
 
     if has_token
       str.size.times { state.chomp }
