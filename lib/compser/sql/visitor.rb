@@ -7,6 +7,8 @@ module Compser::SQL
 
       tag, *args = ast
 
+      return if tag.nil?
+
       send("visit_#{tag}", *[ast, *args])
     end
 
