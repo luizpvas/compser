@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Compser::SQL
-  class Formatter
+  class Formatter < Visitor
     def self.format(ast)
       formatter = new
-      formatter.call(ast)
+      formatter.visit(ast)
       formatter.output.strip
     end
 
@@ -15,64 +15,75 @@ module Compser::SQL
       @indent = 0
     end
 
-    def call(term)
-      case term
-      in [:select, result_columns, from, where]
-        write "SELECT" and newline and indent
+    def visit_select(_node, result_columns, from, where)
+      write "SELECT" and newline and indent
 
-        result_columns.map.with_index do |result_column, index|
-          call(result_column)
+      result_columns.map.with_index do |result_column, index|
+        visit(result_column)
 
-          if index == result_columns.size - 1
-            newline
-          else
-            write "," and newline
-          end
+        if index == result_columns.size - 1
+          newline
+        else
+          write "," and newline
         end
-
-        call(from)
-        call(where)
-
-      in :star
-        write "*"
-
-      in [:integer, literal]
-        write literal.to_s
-
-      in [:name, name]
-        write name
-      
-      in [:alias, result, name]
-        call(result) and write " AS " and call(name)
-
-      in [:named_placeholder, name]
-        write ":" and write name
-
-      in [:from, name, join]
-        unindent and write "FROM" and newline and indent
-        call(name) and newline
-        call(join)
-
-      in [:inner_join, related, left, operator, right]
-        unindent and write "INNER JOIN" and newline and indent
-        call(related) and space
-        write "ON" and space
-        call(left) and space
-        write operator and space
-        call(right) and newline
-
-      in [:where, expr]
-        unindent and write "WHERE" and newline and indent
-        call(expr)
-
-      in [:expr_binary, left, operator, right]
-        call(left) and space
-        write operator and space
-        call(right)
-
-      in nil
-        nil
       end
+
+      visit(from)
+      visit(where)
+    end
+
+    def visit_star(_node)
+      write "*"
+    end
+
+    def visit_integer(_node, literal)
+      write literal.to_s
+    end
+
+    def visit_name(_node, name)
+      write name
+    end
+
+    def visit_alias(_node, result_column, name)
+      visit(result_column)
+      write " AS "
+      visit(name)
+    end
+
+    def visit_named_placeholder(_node, name)
+      write ":"
+      write name
+    end
+
+    def visit_positional_placeholder(_node, position)
+      write "$"
+      write position.to_s
+    end
+
+    def visit_from(_node, name, join)
+      unindent and write "FROM" and newline and indent
+      visit(name) and newline
+      visit(join)
+    end
+
+    def visit_inner_join(_node, related, left, operator, right)
+      unindent and write "INNER JOIN" and newline and indent
+      visit(related) and space
+      write "ON" and space
+      visit(left) and space
+      write operator and space
+      visit(right) and newline
+    end
+
+    def visit_where(_node, expr)
+      unindent and write "WHERE" and newline and indent
+      visit(expr)
+    end
+
+    def visit_expr_binary(_node, left, operator, right)
+      visit(left) and space
+      write operator and space
+      visit(right)
     end
 
     private
