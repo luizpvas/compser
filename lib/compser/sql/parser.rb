@@ -106,9 +106,9 @@ module Compser::SQL
     end
 
     def expr_binary
-      map(->(operator, expr) do
-        lambda do |previous_expr|
-          [:expr_binary, previous_expr, operator, expr]
+      map(->(operator, expr_right) do
+        lambda do |expr_left|
+          [:expr_binary, expr_left, operator, expr_right]
         end
       end)
         .take(operator)
