@@ -14,20 +14,20 @@ module Compser::SQL
     end
 
     def select
-      map(->(results, from, where) { [:select, results, from, where] })
+      map(->(result_columns, from, where) { [:select, result_columns, from, where] })
         .drop(:keywordi, "select")
         .drop(:spaces)
-        .take(results)
+        .take(result_columns)
         .drop(:spaces)
         .take(:one_of, [ from, -> { _1.good!(nil) } ])
         .drop(:spaces)
         .take(:one_of, [ where, -> { _1.good!(nil) } ])
     end
 
-    def results
+    def result_columns
       map(->(*args) { args })
         .take(:sequence, ->(continue, done) do
-          result
+          result_column
             .drop(:spaces)
             .take(:one_of, [
               drop(:token, ",").drop(:spaces).and_then(continue),
@@ -36,9 +36,21 @@ module Compser::SQL
         end)
     end
 
-    def result
-      map(->(result, as) { as.nil? ? result : [:aliased, result, as] })
-        .take(:one_of, [ integer, name ])
+    def result_column
+      take(:one_of, [
+        result_column_star,
+        result_column_expr
+      ])
+    end
+
+    def result_column_star
+      map(->() { :star })
+        .drop(:token, "*")
+    end
+
+    def result_column_expr
+      map(->(result_column, as) { as.nil? ? result_column : [:alias, result_column, as] })
+        .take(expr)
         .drop(:spaces)
         .take(:one_of, [
           drop(:keywordi, "as").drop(:spaces).take(name),
@@ -88,6 +100,7 @@ module Compser::SQL
     def expr_leaf
       take(:one_of, [
         integer,
+        named_variable,
         name
       ])
     end
@@ -135,6 +148,14 @@ module Compser::SQL
 
     def name
       map(->(name) { [:name, name] })
+        .and_then(:chomp_if, IsChar)
+        .and_then(:chomp_while, IsAlpha)
+        .and_then { |state| state.good!(state.consume_chomped) }
+    end
+
+    def named_variable
+      map(->(name) { [:named_variable, name] })
+        .drop(:token, ":")
         .and_then(:chomp_if, IsChar)
         .and_then(:chomp_while, IsAlpha)
         .and_then { |state| state.good!(state.consume_chomped) }

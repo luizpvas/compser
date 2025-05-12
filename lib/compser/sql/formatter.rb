@@ -17,13 +17,13 @@ module Compser::SQL
 
     def call(term)
       case term
-      in [:select, results, from, where]
+      in [:select, result_columns, from, where]
         write "SELECT" and newline and indent
 
-        results.map.with_index do |result, index|
-          call(result)
+        result_columns.map.with_index do |result_column, index|
+          call(result_column)
 
-          if index == results.size - 1
+          if index == result_columns.size - 1
             newline
           else
             write "," and newline
@@ -33,14 +33,20 @@ module Compser::SQL
         call(from)
         call(where)
 
+      in :star
+        write "*"
+
       in [:integer, literal]
         write literal.to_s
 
       in [:name, name]
         write name
       
-      in [:aliased, result, name]
+      in [:alias, result, name]
         call(result) and write " AS " and call(name)
+
+      in [:named_variable, name]
+        write ":" and write name
 
       in [:from, name, join]
         unindent and write "FROM" and newline and indent

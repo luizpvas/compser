@@ -44,6 +44,27 @@ class Compser::SQL::TestParser < Minitest::Test
       WHERE
         users.role = 1 AND users.status = 2
     SQL
+
+    assert_sql <<~SQL
+      SELECT
+        *
+      FROM
+        users
+      WHERE
+        role = :role
+    SQL
+
+    assert_sql <<~SQL
+      SELECT
+        name,
+        email_address
+      FROM
+        users
+      INNER JOIN
+        applications ON applications.id = users.application_id
+      WHERE
+        role = :role AND applications.status = :application_status
+    SQL
   end
 
   def assert_sql(sql)
