@@ -100,7 +100,7 @@ module Compser::SQL
     def expr_leaf
       take(:one_of, [
         integer,
-        named_variable,
+        named_placeholder,
         name
       ])
     end
@@ -153,8 +153,8 @@ module Compser::SQL
         .and_then { |state| state.good!(state.consume_chomped) }
     end
 
-    def named_variable
-      map(->(name) { [:named_variable, name] })
+    def named_placeholder
+      map(->(name) { [:named_placeholder, name] })
         .drop(:token, ":")
         .and_then(:chomp_if, IsChar)
         .and_then(:chomp_while, IsAlpha)

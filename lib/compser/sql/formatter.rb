@@ -45,7 +45,7 @@ module Compser::SQL
       in [:alias, result, name]
         call(result) and write " AS " and call(name)
 
-      in [:named_variable, name]
+      in [:named_placeholder, name]
         write ":" and write name
 
       in [:from, name, join]
