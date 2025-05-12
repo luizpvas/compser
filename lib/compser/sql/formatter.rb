@@ -17,7 +17,7 @@ module Compser::SQL
 
     def call(term)
       case term
-      in [:select, results, from]
+      in [:select, results, from, where]
         write "SELECT" and newline and indent
 
         results.map.with_index do |result, index|
@@ -31,6 +31,7 @@ module Compser::SQL
         end
 
         call(from)
+        call(where)
 
       in [:integer, literal]
         write literal.to_s
@@ -50,6 +51,15 @@ module Compser::SQL
         unindent and write "INNER JOIN" and newline and indent
         call(related) and space
         write "ON" and space
+        call(left) and space
+        write operator and space
+        call(right) and newline
+
+      in [:where, expr]
+        unindent and write "WHERE" and newline and indent
+        call(expr)
+
+      in [:expr_binary, left, operator, right]
         call(left) and space
         write operator and space
         call(right)

@@ -32,6 +32,17 @@ class Compser::SQL::TestParser < Minitest::Test
         users
       INNER JOIN
         applications ON applications.id = users.application_id
+      WHERE
+        users.role = 1
+    SQL
+
+    assert_sql <<~SQL
+      SELECT
+        name
+      FROM
+        users
+      WHERE
+        users.role = 1 AND users.status = 2
     SQL
   end
 

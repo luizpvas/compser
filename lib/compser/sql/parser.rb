@@ -14,12 +14,14 @@ module Compser::SQL
     end
 
     def select
-      map(->(results, from) { [:select, results, from] })
+      map(->(results, from, where) { [:select, results, from, where] })
         .drop(:keywordi, "select")
         .drop(:spaces)
         .take(results)
         .drop(:spaces)
         .take(:one_of, [ from, -> { _1.good!(nil) } ])
+        .drop(:spaces)
+        .take(:one_of, [ where, -> { _1.good!(nil) } ])
     end
 
     def results
@@ -73,9 +75,59 @@ module Compser::SQL
         .take(name)
     end
 
+    def expr
+      map(->(expr, f) { f.call(expr) })
+        .take(expr_leaf)
+        .drop(:spaces)
+        .take(:one_of, [
+          expr_binary,
+          -> { _1.good!(->(x) { x }) }
+        ])
+    end
+
+    def expr_leaf
+      take(:one_of, [
+        integer,
+        name
+      ])
+    end
+
+    def expr_binary
+      map(->(operator, expr) do
+        lambda do |previous_expr|
+          [:expr_binary, previous_expr, operator, expr]
+        end
+      end)
+        .take(operator)
+        .drop(:spaces)
+        .take(:lazy, -> { expr })
+    end
+
+    def where
+      map(->(expr) { [:where, expr] })
+        .drop(:keywordi, "where")
+        .drop(:spaces)
+        .take(expr)
+    end
+
     def integer
       map(->(value) { [:integer, value] })
         .take(:integer)
+    end
+
+    def operator
+      take(:one_of, [
+        take(:token, "="),
+        take(:token, "!="),
+        take(:token, "<>"),
+        take(:token, ">"),
+        take(:token, ">="),
+        take(:token, "<"),
+        take(:token, "<="),
+        take(:token, "AND"),
+        take(:token, "OR"),
+        take(:token, "IN")
+      ])
     end
 
     IsChar = ->(c) { c.match?(/[a-zA-Z_]/) }
